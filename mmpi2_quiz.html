@@ -1,0 +1,744 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="MMPI-2 퀴즈">
+<title>MMPI-2 핵심 암기 퀴즈</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+:root{
+  --bg:#ffffff;--bg2:#f5f4f0;--bg3:#eceae4;
+  --text:#1a1a1a;--text2:#6b6b6b;--text3:#999;
+  --border:#e0ddd6;--border2:#c8c5bc;
+  --correct-bg:#e6f7ef;--correct-border:#1a9e6f;--correct-text:#0a5c40;
+  --wrong-bg:#fdf0eb;--wrong-border:#d45a28;--wrong-text:#7a2e10;
+  --info-bg:#e8f0fb;--info-text:#1a4a9e;
+  --accent:#1a1a1a;
+  --radius:10px;--radius-lg:14px;
+}
+@media(prefers-color-scheme:dark){
+  :root{
+    --bg:#1c1c1e;--bg2:#2c2c2e;--bg3:#3a3a3c;
+    --text:#f2f2f7;--text2:#aeaeb2;--text3:#6e6e73;
+    --border:#3a3a3c;--border2:#545458;
+    --correct-bg:#0a2e1f;--correct-border:#1a9e6f;--correct-text:#4fd4a0;
+    --wrong-bg:#2e150a;--wrong-border:#d45a28;--wrong-text:#f0a070;
+    --info-bg:#0a1e3a;--info-text:#60a0f0;
+    --accent:#f2f2f7;
+  }
+}
+body{font-family:-apple-system,BlinkMacSystemFont,'Malgun Gothic','Apple SD Gothic Neo',sans-serif;background:var(--bg3);color:var(--text);min-height:100vh;}
+.app{max-width:680px;margin:0 auto;padding:0 0 80px;}
+
+/* Header */
+.header{background:var(--bg);border-bottom:1px solid var(--border);padding:14px 16px;position:sticky;top:0;z-index:100;}
+.header-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
+.app-title{font-size:17px;font-weight:600;color:var(--text);}
+.stats-row{display:flex;gap:8px;}
+.stat-pill{font-size:12px;padding:3px 10px;border-radius:20px;border:1px solid var(--border);background:var(--bg2);color:var(--text2);}
+.stat-pill b{color:var(--text);font-weight:600;}
+.prog-wrap{height:4px;background:var(--bg3);border-radius:2px;overflow:hidden;}
+.prog-fill{height:100%;background:var(--accent);border-radius:2px;transition:width .4s ease;}
+
+/* Filters */
+.filter-wrap{background:var(--bg);padding:10px 16px;border-bottom:1px solid var(--border);overflow-x:auto;white-space:nowrap;-webkit-overflow-scrolling:touch;}
+.filter-wrap::-webkit-scrollbar{display:none;}
+.filter-btn{display:inline-block;font-size:13px;padding:5px 14px;border-radius:20px;border:1px solid var(--border2);background:transparent;color:var(--text2);cursor:pointer;margin-right:6px;white-space:nowrap;transition:all .15s;}
+.filter-btn.active{background:var(--accent);color:var(--bg);border-color:var(--accent);}
+
+/* Cards */
+.card-list{padding:12px 12px 0;}
+.card{background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-lg);padding:16px;margin-bottom:10px;transition:border-color .2s;}
+.card.answered-correct{border-color:var(--correct-border);background:var(--correct-bg);}
+.card.answered-wrong{border-color:var(--wrong-border);background:var(--wrong-bg);}
+.card-meta{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px;}
+.tag{font-size:11px;font-weight:600;padding:3px 9px;border-radius:20px;}
+.tag-cat{background:var(--info-bg);color:var(--info-text);}
+.tag-type{background:var(--bg2);color:var(--text3);border:1px solid var(--border);}
+.qnum{font-size:11px;color:var(--text3);margin-left:auto;}
+
+.question{font-size:15px;line-height:1.75;color:var(--text);margin-bottom:12px;}
+.blank-marker{display:inline-block;border-bottom:2px solid var(--accent);min-width:70px;text-align:center;padding:0 4px;color:var(--text3);}
+.blank-filled-ok{border-bottom:2px solid var(--correct-border);color:var(--correct-text);background:rgba(26,158,111,0.12);border-radius:3px;padding:0 4px;}
+.blank-filled-ng{border-bottom:2px solid var(--wrong-border);color:var(--wrong-text);background:rgba(212,90,40,0.12);border-radius:3px;padding:0 4px;}
+
+/* Inputs */
+.input-area{display:flex;flex-direction:column;gap:8px;}
+.inp-row{display:flex;gap:8px;align-items:center;}
+.inp-label{font-size:12px;color:var(--text3);min-width:40px;}
+.q-input{flex:1;font-size:15px;padding:9px 12px;border:1px solid var(--border2);border-radius:var(--radius);background:var(--bg);color:var(--text);outline:none;-webkit-appearance:none;}
+.q-input:focus{border-color:var(--accent);}
+.q-input.inp-ok{border-color:var(--correct-border);background:var(--correct-bg);}
+.q-input.inp-ng{border-color:var(--wrong-border);background:var(--wrong-bg);}
+.check-btn{width:100%;padding:10px;font-size:14px;font-weight:600;border-radius:var(--radius);border:1px solid var(--border2);background:var(--bg2);color:var(--text);cursor:pointer;margin-top:2px;}
+.check-btn:active{opacity:.7;}
+
+/* Choices */
+.choices{display:flex;flex-direction:column;gap:7px;}
+.choice-btn{padding:11px 14px;font-size:14px;text-align:left;border-radius:var(--radius);border:1px solid var(--border);background:var(--bg);color:var(--text);cursor:pointer;line-height:1.5;transition:all .15s;}
+.choice-btn:active{opacity:.7;}
+.choice-btn.selected-ok{background:var(--correct-bg);border-color:var(--correct-border);color:var(--correct-text);font-weight:600;}
+.choice-btn.selected-ng{background:var(--wrong-bg);border-color:var(--wrong-border);color:var(--wrong-text);}
+.choice-btn.reveal{background:var(--correct-bg);border-color:var(--correct-border);color:var(--correct-text);font-weight:600;}
+.choice-btn:disabled{cursor:default;}
+
+/* Feedback */
+.feedback{display:none;margin-top:10px;padding:10px 12px;border-radius:var(--radius);font-size:13px;line-height:1.65;}
+.feedback.ok{background:var(--correct-bg);color:var(--correct-text);border:1px solid var(--correct-border);}
+.feedback.ng{background:var(--wrong-bg);color:var(--wrong-text);border:1px solid var(--wrong-border);}
+.ans-badge{display:inline-block;font-weight:700;padding:1px 6px;background:rgba(26,158,111,0.18);border-radius:3px;}
+.hint-text{margin-top:4px;font-size:12px;opacity:.8;}
+
+/* Bottom bar */
+.bottom-bar{position:fixed;bottom:0;left:0;right:0;background:var(--bg);border-top:1px solid var(--border);padding:10px 16px;display:flex;gap:8px;z-index:100;}
+.bottom-bar button{flex:1;padding:10px;font-size:13px;font-weight:600;border-radius:var(--radius);border:1px solid var(--border2);background:var(--bg2);color:var(--text);cursor:pointer;}
+.bottom-bar button:active{opacity:.7;}
+.btn-reset{color:var(--wrong-text) !important;border-color:var(--wrong-border) !important;}
+
+/* Empty */
+.empty-msg{padding:40px 16px;text-align:center;color:var(--text3);font-size:14px;}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="header">
+    <div class="header-top">
+      <div class="app-title">MMPI-2 핵심 암기 퀴즈</div>
+      <div class="stats-row">
+        <div class="stat-pill">✓ <b id="sc">0</b></div>
+        <div class="stat-pill">✗ <b id="wc">0</b></div>
+        <div class="stat-pill">남 <b id="rc">0</b></div>
+      </div>
+    </div>
+    <div class="prog-wrap"><div class="prog-fill" id="prog" style="width:0%"></div></div>
+  </div>
+  <div class="filter-wrap" id="filters"></div>
+  <div class="card-list" id="list"></div>
+</div>
+<div class="bottom-bar">
+  <button onclick="scrollToFirst()">⬆ 첫 문제</button>
+  <button onclick="scrollToNext()">→ 다음 미답</button>
+  <button class="btn-reset" onclick="confirmReset()">↺ 초기화</button>
+</div>
+
+<script>
+const QS = [
+  // ── 타당도 척도 ──────────────────────────────────────────
+  {id:1,cat:"타당도 척도",type:"빈칸",
+   q:"VRIN은 <b>[ ]</b> 비일관성, TRIN은 <b>[ ]</b> 비일관성을 측정한다.",
+   blanks:["무선반응","고정반응"],hint:"VRIN=Variable, TRIN=True Response Inconsistency"},
+  {id:2,cat:"타당도 척도",type:"선택",
+   q:"F 척도는 검사 <b>[ ]</b>부의 비전형 반응을 탐지한다.",
+   choices:["전반","후반","전체","중간"],ans:"전반",
+   hint:"F는 1~370번 문항에 분포, 후반부는 F(B)"},
+  {id:3,cat:"타당도 척도",type:"빈칸",
+   q:"F(B) 척도는 <b>[ ]</b>번 문항 이후에 분포하며, <b>[ ]</b>개 문항으로 구성된다.",
+   blanks:["281","40"],hint:"후반부 비전형 척도, 특히 내용·보충 척도에 영향"},
+  {id:4,cat:"타당도 척도",type:"선택",
+   q:"F(P)는 규준집단과 <b>[ ]</b> 모두에서 비전형적인 반응으로 구성된다.",
+   choices:["외래환자","입원환자","임상가","학생"],ans:"외래환자",
+   hint:"F에 비해 정신병리에 덜 민감, Faking bad 탐지"},
+  {id:5,cat:"타당도 척도",type:"빈칸",
+   q:"FBS는 원래 <b>[ ]</b> Scale로 불렸으며, <b>[ ]</b> 소송 장면에서 증상 과장을 탐지한다.",
+   blanks:["Fake Bad","개인 상해"],hint:"43개 문항, 신체·인지 증상 과장 탐지"},
+  {id:6,cat:"타당도 척도",type:"선택",
+   q:"L 척도는 <b>[ ]</b>하고 세련되지 못한 방어 태도를 탐지한다.",
+   choices:["순진","교묘","세련된","의식적인"],ans:"순진",
+   hint:"사소한 결점조차 부인, 교육수준 높을수록 낮은 경향"},
+  {id:7,cat:"타당도 척도",type:"빈칸",
+   q:"K 척도는 정상인의 경우 <b>[ ]</b> 또는 심리적 자원을 의미하며, 높은 점수는 <b>[ ]</b> 성향을 시사한다.",
+   blanks:["자아강도","방어적"],hint:"L보다 세련된 방어, 30개 문항으로 구성"},
+  {id:8,cat:"타당도 척도",type:"선택",
+   q:"S 척도는 어떤 집단 지원자들의 자료를 정상군과 비교하여 개발되었나?",
+   choices:["항공사 조종사","경찰관","교사","의사"],ans:"항공사 조종사",
+   hint:"Superlative Self-Presenting, K와 상관 매우 높음"},
+  {id:9,cat:"타당도 척도",type:"선택",
+   q:"타당도 프로파일에서 L↑·K↑·F↓ 'V자' 형태는 어떤 태도를 시사하는가?",
+   choices:["Faking good (방어적)","Faking bad","무선반응","불성실"],ans:"Faking good (방어적)",
+   hint:"경사가 심할수록 자신을 좋게 보이려는 경향"},
+  {id:10,cat:"타당도 척도",type:"빈칸",
+   q:"뒤집힌 V형(F↑·L↓·K↓)은 <b>[ ]</b> 가능성과 함께, 자신의 어려움을 인정하고 <b>[ ]</b>적 태도를 시사한다.",
+   blanks:["Faking bad","협조"],hint:"F 65T 이상, L·K 50T 이하"},
+  {id:11,cat:"타당도 척도",type:"선택",
+   q:"무응답 원점수 30개 이상일 때의 해석은?",
+   choices:["무효일 것임","주의해서 해석","유효할 것임","재검사 필요"],ans:"무효일 것임",
+   hint:"11~29개는 무효일 수 있음, 10개 이하는 유효"},
+  {id:12,cat:"타당도 척도",type:"빈칸",
+   q:"'그렇다'와 '아니다'에 모두 답한 문항은 <b>[ ]</b>으로 처리되며, 10개 이하면 <b>[ ]</b>할 것으로 본다.",
+   blanks:["무응답","유효"],hint:"무응답 척도(Cannot Say, ?) 기준"},
+  {id:13,cat:"타당도 척도",type:"선택",
+   q:"VRIN T점수 80 이상에서 제일 먼저 의심해야 할 것은?",
+   choices:["불성실 응답·무선반응","심한 정신병리","방어적 태도","Faking good"],ans:"불성실 응답·무선반응",
+   hint:"비협조·동기결여·독해력 부족·심한 내적 혼란"},
+  {id:14,cat:"타당도 척도",type:"빈칸",
+   q:"TRIN 원점수 계산식: <b>[ ]</b> – <b>[ ]</b> + 9이며, T점수는 항상 <b>[ ]</b> 이상으로 환산된다.",
+   blanks:["그렇다","아니다","50"],hint:"고정반응 비일관성 척도, 20개 문항쌍·23개 반응쌍"},
+  {id:15,cat:"타당도 척도",type:"선택",
+   q:"K 척도가 40 미만일 때 시사하는 것은?",
+   choices:["Faking bad (부정 왜곡)","Faking good","방어적 태도","무선반응"],ans:"Faking bad (부정 왜곡)",
+   hint:"K 40-64 유효, 40 미만 부정 왜곡 가능"},
+  {id:16,cat:"타당도 척도",type:"빈칸",
+   q:"F 척도는 정상집단에서 응답률이 <b>[ ]</b>% 미만인 <b>[ ]</b>개 문항으로 구성된다.",
+   blanks:["10","60"],hint:"비전형적 반응·비정형적 사고 탐지"},
+  {id:17,cat:"타당도 척도",type:"선택",
+   q:"K로 상승하는 타당도 형태(L↓→F→K↑)의 특징은?",
+   choices:["세련되게 방어하는","고통에 처해있는","무선반응","Faking bad"],ans:"세련되게 방어하는",
+   hint:"L≈40, F≈50~55, K≈65~75"},
+  {id:18,cat:"타당도 척도",type:"선택",
+   q:"뒤집힌 V & 높은 K(K↑·F≥K·L↓) 형태의 특징은?",
+   choices:["자아강도가 좋으나 만성적 문제 보유","심각한 정신병적 혼란","Faking good","무선응답"],ans:"자아강도가 좋으나 만성적 문제 보유",
+   hint:"정서적 고통감 없이 만성 적응, 현재 스트레스 완화 시 만족"},
+  {id:19,cat:"타당도 척도",type:"빈칸",
+   q:"F(B) T점수가 F에 비해 <b>[ ]</b> 이상 높을 때 검사 과정에서 수검 태도의 변화가 있었다고 판단한다.",
+   blanks:["30"],hint:"후반부 응답 태도 변화 탐지"},
+  {id:20,cat:"타당도 척도",type:"선택",
+   q:"모두 '예' 반응 프로파일의 특징으로 옳은 것은?",
+   choices:["F≈120T, L·K≤35T","F↓, L·K↑","L·F·K 모두 80T 이상","K로 상승하는 선형"],ans:"F≈120T, L·K≤35T",
+   hint:"임상 척도 6·(7)·8·9번도 90T 이상으로 상승"},
+
+  // ── K 교정 ──────────────────────────────────────────────
+  {id:21,cat:"K 교정",type:"선택",
+   q:"K 교정이 적용되지 않는 임상 척도는?",
+   choices:["2번(D)","1번(Hs)","7번(Pt)","9번(Ma)"],ans:"2번(D)",
+   hint:"K교정 적용 척도: 1, 4, 7, 8, 9번"},
+  {id:22,cat:"K 교정",type:"빈칸",
+   q:"K 교정이 적용되는 5개 임상 척도는 <b>[ ]</b>, <b>[ ]</b>, <b>[ ]</b>, <b>[ ]</b>, <b>[ ]</b>번이다.",
+   blanks:["1","4","7","8","9"],hint:"Hs, Pd, Pt, Sc, Ma"},
+  {id:23,cat:"K 교정",type:"선택",
+   q:"K 척도 개발의 목적으로 가장 적절한 것은?",
+   choices:["심리적 문제가 있으나 정상 프로파일을 보인 환자와 정상인을 변별","무선반응 탐지","Faking bad 탐지","임상집단과 비교집단 변별"],ans:"심리적 문제가 있으나 정상 프로파일을 보인 환자와 정상인을 변별",
+   hint:"경험적 방식으로 제작, 높은 K = 방어적"},
+  {id:24,cat:"K 교정",type:"빈칸",
+   q:"K 교정은 심리적 문제가 있으면서 임상척도에서 <b>[ ]</b> 반응을 보인 사람들과 정상인을 비교하는 <b>[ ]</b> 방식으로 제작되었다.",
+   blanks:["정상범위의","경험적"],hint:"K교정 가중치 산출 후 원점수에 합산"},
+
+  // ── 임상 척도 ─────────────────────────────────────────
+  {id:25,cat:"임상 척도",type:"선택",
+   q:"3번(Hy) 척도는 심리적 갈등을 어떤 방식으로 표현하는 경향과 관련 있나?",
+   choices:["신체화","행동화","지성화","억압"],ans:"신체화",
+   hint:"전환장애 코드타입 1-3"},
+  {id:26,cat:"임상 척도",type:"빈칸",
+   q:"9번(Ma) 척도는 나이가 들면서 점수가 <b>[ ]</b>하며, 청소년의 경우 성인보다 점수가 <b>[ ]</b>다.",
+   blanks:["감소","높"],hint:"4, 8, 9, F: 청소년 > 성인"},
+  {id:27,cat:"임상 척도",type:"선택",
+   q:"교육수준이 높을수록 점수가 증가하는 타당도 척도는?",
+   choices:["K","F","L","0번"],ans:"K",
+   hint:"F, 0번은 교육수준 높을수록 감소"},
+  {id:28,cat:"임상 척도",type:"빈칸",
+   q:"임상 척도 중 문항 수가 가장 많은 척도는 <b>[ ]</b>번이며 <b>[ ]</b>문항이지만, 고유 문항은 <b>[ ]</b>문항에 불과하다.",
+   blanks:["8","78","16"],hint:"문항 중복 문제, 척도 간 높은 상관"},
+  {id:29,cat:"임상 척도",type:"선택",
+   q:"6번(Pa) 척도가 높을 때 나타나는 특징이 아닌 것은?",
+   choices:["타인에 대한 높은 신뢰","타인 의심·불신","피해사고","예민성"],ans:"타인에 대한 높은 신뢰",
+   hint:"Pa = Paranoia, 편집성"},
+  {id:30,cat:"임상 척도",type:"빈칸",
+   q:"여성에게서 더 높이 상승하는 경향이 있는 임상 척도는 <b>[ ]</b>번과 <b>[ ]</b>번이며, 남성에게서 높은 척도는 <b>[ ]</b>번과 <b>[ ]</b>번이다.",
+   blanks:["3","6","1","7"],hint:"성별에 따른 척도 점수 차이"},
+  {id:31,cat:"임상 척도",type:"선택",
+   q:"1번(Hs) 척도와 2번(D) 척도는 나이가 들면서 어떻게 변하나?",
+   choices:["증가","감소","변화 없음","10대에만 상승"],ans:"증가",
+   hint:"노화·신체 관심 증가와 관련"},
+  {id:32,cat:"임상 척도",type:"선택",
+   q:"5번(Mf) 척도의 원래 개발 목적은?",
+   choices:["동성애 남성과 이성애 남성을 변별","불안 수준 측정","사회적 내향성 평가","방어성 탐지"],ans:"동성애 남성과 이성애 남성을 변별",
+   hint:"Hathaway & McKinley 개발, 현재는 성역할 흥미 등으로 해석"},
+  {id:33,cat:"임상 척도",type:"빈칸",
+   q:"0번(Si) 척도를 개발한 사람은 <b>[ ]</b>이며, 미네소타 <b>[ ]</b> 검사에서 내향성-외향성 척도에 기초하였다.",
+   blanks:["Drake","T-S-E"],hint:"내향성 척도, 사회적 내향성 측정"},
+  {id:34,cat:"임상 척도",type:"선택",
+   q:"7번(Pt) 척도와 관련 없는 것은?",
+   choices:["낙관적·활동적 상태","불안·강박","죄책감","긴장"],ans:"낙관적·활동적 상태",
+   hint:"Pt=Psychasthenia, 불안·강박 척도"},
+  {id:35,cat:"임상 척도",type:"빈칸",
+   q:"8번(Sc) 척도 해석 시 '조현병이라고 부르기보다는 <b>[ ]</b>, 소외감, <b>[ ]</b> 흥미, 좋지 않은 가족관계' 등으로 기술한다.",
+   blanks:["무감동","철학적"],hint:"단일 척도 해석의 한계, 다차원적 속성"},
+  {id:36,cat:"임상 척도",type:"선택",
+   q:"코드타입에서 전통적으로 제외되는 척도 2개는?",
+   choices:["5번과 0번","1번과 9번","2번과 7번","3번과 8번"],ans:"5번과 0번",
+   hint:"나머지 8개 척도로 코드타입 구성"},
+
+  // ── 코드 타입 ────────────────────────────────────────
+  {id:37,cat:"코드 타입",type:"빈칸",
+   q:"코드 타입은 임상 척도 중 T점수 <b>[ ]</b>점 이상인 척도 중 가장 높은 2~3개 척도로 구성되며, <b>[ ]</b>된 코드타입만 해석이 권장된다.",
+   blanks:["65","정의(defined)"],hint:"T점수가 높을수록 해석적 가설에 확신"},
+  {id:38,cat:"코드 타입",type:"선택",
+   q:"2-7/7-2 코드타입의 핵심 특징은?",
+   choices:["불안·초조와 만성 우울","신체증상과 전환","사회적 기준 무시","피해망상과 환각"],ans:"불안·초조와 만성 우울",
+   hint:"우울장애·불안장애: 2-7-0 type"},
+  {id:39,cat:"코드 타입",type:"선택",
+   q:"4-9/9-4 코드타입의 특징은?",
+   choices:["사회적 기준·가치 무시, 일탈행동","친밀관계 회피","신체증상 망상화","감정통제와 폭발 반복"],ans:"사회적 기준·가치 무시, 일탈행동",
+   hint:"반사회적 성격 관련"},
+  {id:40,cat:"코드 타입",type:"빈칸",
+   q:"정신분열병 코드타입은 <b>[ ]</b>-<b>[ ]</b>이며, 전환장애는 <b>[ ]</b>-<b>[ ]</b> type이다.",
+   blanks:["6","8","1","3"],hint:"Conversion V: 1>2<3 형태"},
+  {id:41,cat:"코드 타입",type:"선택",
+   q:"6-8/8-6 코드타입의 대표 특징은?",
+   choices:["피해·과대망상, 환각, 비현실감","무모한 행동 후 죄책감","감정통제와 폭발 반복","신체·심리적 불편감"],ans:"피해·과대망상, 환각, 비현실감",
+   hint:"정신병적 증상, 타인 의심·불신"},
+  {id:42,cat:"코드 타입",type:"선택",
+   q:"양극성 장애(조증 상태)와 관련된 척도 상승 패턴은?",
+   choices:["9번 상승 + α","2-7-0 type","1-3 type","6-8 type"],ans:"9번 상승 + α",
+   hint:"Ma(경조증) 척도 상승"},
+  {id:43,cat:"코드 타입",type:"빈칸",
+   q:"1-2/2-1 코드타입은 신체적 증상과 함께 <b>[ ]</b>, <b>[ ]</b>, 긴장, 걱정 등의 심리적 불편감을 호소한다.",
+   blanks:["우울","불안"],hint:"신체·심리 복합 호소"},
+  {id:44,cat:"코드 타입",type:"선택",
+   q:"2-4/4-2 코드타입의 특징은?",
+   choices:["무모한 행동 후 후회·죄책감","불안·초조·만성 우울","친밀관계 회피","신체증상·심리 불편감"],ans:"무모한 행동 후 후회·죄책감",
+   hint:"충동적 행동 후 자기비판"},
+  {id:45,cat:"코드 타입",type:"빈칸",
+   q:"3-4/4-3 코드타입은 만성적이고 강한 <b>[ ]</b>와 <b>[ ]</b>으로 인해 부적절한 감정 표현을 보인다.",
+   blanks:["분노","적개심"],hint:"감정 억압과 폭발의 반복"},
+  {id:46,cat:"코드 타입",type:"선택",
+   q:"7-8/8-7 코드타입에서 8번 척도가 우세해질수록 나타나는 특징은?",
+   choices:["심한 병적 증상에 적응된 상태","심각한 불안 증가","충동적 행동화","사회적 관계 개선"],ans:"심한 병적 증상에 적응된 상태",
+   hint:"상당히 혼란스러운 정서적 동요 상태"},
+  {id:47,cat:"코드 타입",type:"빈칸",
+   q:"신경증적 증상 코드타입은 <b>[ ]</b>-<b>[ ]</b>-<b>[ ]</b> 혹은 2-1-3, 2-3-1 type이며, 우울·불안장애는 <b>[ ]</b>-<b>[ ]</b>-0 type이다.",
+   blanks:["1","2","3","2","7"],hint:"코드타입 → 진단적 함의"},
+  {id:48,cat:"코드 타입",type:"선택",
+   q:"2-0/0-2 코드타입의 핵심 특징은?",
+   choices:["사회적 상황 부적절감·고립·심한 감정억제","무모한 행동 후 죄책감","피해망상과 환각","신체적 증상 호소"],ans:"사회적 상황 부적절감·고립·심한 감정억제",
+   hint:"0번=사회적 내향성, 고립과 위축"},
+  {id:49,cat:"코드 타입",type:"선택",
+   q:"4-6/6-4 코드타입의 특징은?",
+   choices:["타인 동기 의심, 사소한 요구에도 화","지나친 감정통제","신체증상 망상화","사회적 규범 순응"],ans:"타인 동기 의심, 사소한 요구에도 화",
+   hint:"편집성 + 반사회성 조합"},
+  {id:50,cat:"코드 타입",type:"빈칸",
+   q:"8-9/9-8 코드타입은 <b>[ ]</b>적이고 정서적으로 <b>[ ]</b>하며 동요되고 흥분된 상태이다.",
+   blanks:["과잉활동","불안정"],hint:"에너지 과잉 + 사고 혼란"},
+
+  // ── 실시 및 해석 ──────────────────────────────────────
+  {id:51,cat:"실시 및 해석",type:"빈칸",
+   q:"MMPI 해석 절차 순서: 타당도 척도 → <b>[ ]</b> → <b>[ ]</b> → 하위척도/결정문항 검토",
+   blanks:["임상척도","코드타입"],hint:"타당도 먼저 → 임상 의미 → 코드타입 → 낮은 척도 → 하위척도"},
+  {id:52,cat:"실시 및 해석",type:"선택",
+   q:"MMPI-2 대상 조건으로 옳지 않은 것은?",
+   choices:["IQ 60 이상","초등학교 6학년 이상의 독해력","IQ 80 이상","중학생 이상(국내 규준)"],ans:"IQ 60 이상",
+   hint:"IQ 80 이상, 현실검증능력이 손상되지 않은 사람"},
+  {id:53,cat:"실시 및 해석",type:"빈칸",
+   q:"MMPI-2 소요 시간은 약 <b>[ ]</b>분이며, 30분 이상 길다면 심각한 우울증·<b>[ ]</b>·뇌 손상·강박적 우유부단 등이 원인일 수 있다.",
+   blanks:["90","정신증"],hint:"지나치게 짧으면 불성실·충동성"},
+  {id:54,cat:"실시 및 해석",type:"선택",
+   q:"단일 척도 상승보다 코드타입 해석을 권장하는 이유는?",
+   choices:["코드타입으로 묶인 집단이 더 동질적이고 경험적 상관물이 더 강력","코드타입이 계산하기 쉬워서","단일 척도는 신뢰도가 없어서","코드타입이 진단명과 일치해서"],ans:"코드타입으로 묶인 집단이 더 동질적이고 경험적 상관물이 더 강력",
+   hint:"복수 척도 상승 → 더 강한 해석적 가설"},
+  {id:55,cat:"실시 및 해석",type:"빈칸",
+   q:"Harris-Lingoes 소척도는 <b>[ ]</b>번 척도에 대해 개발되었으며, 해석은 해당 임상척도가 <b>[ ]</b>T 이상이고 소척도가 65T 이상일 때만 적용한다.",
+   blanks:["2, 3, 4, 6, 8, 9","65"],hint:"0번은 Ben-Porath 등이 추가 개발"},
+  {id:56,cat:"실시 및 해석",type:"선택",
+   q:"집에서 검사지를 가져가 작성하는 것을 권장하지 않는 이유는?",
+   choices:["규준집단 실시 방식과 달라 결과 차이 가능","시간이 너무 오래 걸려서","채점이 어려워서","비밀보장이 안 돼서"],ans:"규준집단 실시 방식과 달라 결과 차이 가능",
+   hint:"수검자가 타인 자문 구할 수도 있음"},
+  {id:57,cat:"실시 및 해석",type:"빈칸",
+   q:"MMPI 해석 시 단일 척도 상승보다 <b>[ ]</b>(코드타입)을 검토하는 것이 더 유용하며, 내용척도는 <b>[ ]</b>T 이상에서 해석한다.",
+   blanks:["프로파일 형태","65"],hint:"내용소척도는 해당 내용척도 60T 이상일 때만"},
+  {id:58,cat:"실시 및 해석",type:"선택",
+   q:"MMPI가 제공하는 것에 대한 설명으로 가장 적절한 것은?",
+   choices:["내담자 문제에 대한 가설적 정보","확정적 진단","치료 계획의 전부","성격의 완전한 기술"],ans:"내담자 문제에 대한 가설적 정보",
+   hint:"해석집 내용에 꼭 맞는 내담자는 거의 없음"},
+  {id:59,cat:"실시 및 해석",type:"빈칸",
+   q:"내용척도는 <b>[ ]</b> 방식으로 개발되어 개별 척도의 <b>[ ]</b>을 최대화하였다.",
+   blanks:["논리적(내용 중심)","내적 일관성"],hint:"경험적 준거방식 한계를 보완, 문항 안면 타당도 높아 왜곡 가능"},
+  {id:60,cat:"실시 및 해석",type:"선택",
+   q:"Si(0번) 소척도 Si3의 높은 점수가 시사하는 것은?",
+   choices:["낮은 자존감, 활동 흥미 결여, 무력감","수줍음과 불안","군중 기피","사회적 관계 개선"],ans:"낮은 자존감, 활동 흥미 결여, 무력감",
+   hint:"Si1=수줍음·자의식, Si2=사회적 회피, Si3=내적·외적 소외"},
+
+  // ── 점수 체계 ──────────────────────────────────────────
+  {id:61,cat:"점수 체계",type:"빈칸",
+   q:"MMPI-2의 T점수는 평균 <b>[ ]</b>, 표준편차 <b>[ ]</b>이며, 임상 범위 기준은 <b>[ ]</b>점 이상이다.",
+   blanks:["50","10","65"],hint:"원판은 70점 기준, MMPI-2부터 65점"},
+  {id:62,cat:"점수 체계",type:"선택",
+   q:"동형(Uniform) T점수를 사용하는 주된 이유는?",
+   choices:["임상척도 간 T점수 비교 가능","원점수를 그대로 보존","신뢰도를 높이기 위해","K교정을 없애기 위해"],ans:"임상척도 간 T점수 비교 가능",
+   hint:"척도 간 동일한 범위와 분포 확보"},
+  {id:63,cat:"점수 체계",type:"선택",
+   q:"MMPI-2 전체 문항 수와, 전반부만으로 임상척도 산출이 가능한 문항 수는?",
+   choices:["567문항 / 370문항","504문항 / 370문항","567문항 / 280문항","478문항 / 350문항"],ans:"567문항 / 370문항",
+   hint:"MMPI-A는 478문항, 전반부 350문항"},
+  {id:64,cat:"점수 체계",type:"빈칸",
+   q:"동형 T점수는 선형 T점수에 비해 척도의 <b>[ ]</b>가 일정해지지만, 전반적인 <b>[ ]</b>가 더 심해지는 경향이 있다.",
+   blanks:["편포","편포"],hint:"높은 점수대(75점 이상)에서 더 높은 동형 T점수 산출"},
+  {id:65,cat:"점수 체계",type:"선택",
+   q:"동형 T점수 65점에 해당하는 백분위는 약 몇 %인가?",
+   choices:["92%","84%","96%","98%"],ans:"92%",
+   hint:"T50≈55%, T60≈85%, T65≈92%, T70≈96%"},
+
+  // ── 통계 개념 ──────────────────────────────────────────
+  {id:66,cat:"통계 개념",type:"선택",
+   q:"크론바흐 알파(α)가 높다고 해서 반드시 보장되는 것은?",
+   choices:["내적 합치도가 높음","단일차원성","재검사 신뢰도","구성타당도"],ans:"내적 합치도가 높음",
+   hint:"신뢰도 높음 ≠ 단일차원성 보장"},
+  {id:67,cat:"통계 개념",type:"빈칸",
+   q:"다차원성이란 하나의 척도 안에 서로 다른 여러 <b>[ ]</b>(요인)이 함께 섞여 있는 상태이며, 반대 개념은 <b>[ ]</b>이다.",
+   blanks:["심리적 차원","단일차원성"],hint:"MMPI 임상척도 한계의 핵심 문제"},
+  {id:68,cat:"통계 개념",type:"선택",
+   q:"탐색적 요인분석(EFA)과 확인적 요인분석(CFA)의 차이로 옳은 것은?",
+   choices:["EFA는 구조를 미리 확정하지 않고 탐색, CFA는 가정한 구조를 검증","EFA는 가설 검증, CFA는 탐색","EFA가 CFA보다 정확","둘 다 구조를 사전 설정"],ans:"EFA는 구조를 미리 확정하지 않고 탐색, CFA는 가정한 구조를 검증",
+   hint:"EFA=Exploratory, CFA=Confirmatory"},
+  {id:69,cat:"통계 개념",type:"빈칸",
+   q:"재검사 신뢰도는 <b>[ ]</b>이 지나 다시 검사했을 때 점수가 얼마나 <b>[ ]</b>인지를 보는 것이다.",
+   blanks:["시간","안정적"],hint:"국내 1주일 간격 재검사: 임상척도 4번 남=.68 여=.73"},
+  {id:70,cat:"통계 개념",type:"선택",
+   q:"준거타당도(Criterion Validity)를 확인하는 방법으로 옳은 것은?",
+   choices:["MMPI 우울척도가 임상진단·의사 평가·다른 우울검사와 관련되는지 확인","문항이 측정하려는 내용을 골고루 포함하는지 확인","이론적 구성 개념을 얼마나 잘 반영하는지 확인","비슷한 개념을 재는 다른 검사와 높은 상관 확인"],ans:"MMPI 우울척도가 임상진단·의사 평가·다른 우울검사와 관련되는지 확인",
+   hint:"동시타당도=현재 기준, 예측타당도=미래 결과"},
+  {id:71,cat:"통계 개념",type:"빈칸",
+   q:"수렴타당도는 비슷한 개념을 재는 다른 검사와 <b>[ ]</b> 상관을 보여야 하고, 변별타당도는 다른 개념과 <b>[ ]</b> 상관을 보여야 한다.",
+   blanks:["높은","낮은"],hint:"구성타당도의 두 하위 개념"},
+  {id:72,cat:"통계 개념",type:"선택",
+   q:"MMPI 임상척도 7번과 8번 척도 간 상관계수가 .82라면 결정계수(r²)는?",
+   choices:["0.6724","0.82","0.41","0.9055"],ans:"0.6724",
+   hint:"r²=공통 변량 비율, .82²=.6724"},
+  {id:73,cat:"통계 개념",type:"빈칸",
+   q:"MMPI에서 척도 간 높은 상관의 원인은 <b>[ ]</b> 문제이며, 이로 인해 요인분석에서 <b>[ ]</b> structure가 나오지 못한다.",
+   blanks:["문항 중복","simple"],hint:"요인수가 2~21개로 다양하게 나옴"},
+  {id:74,cat:"통계 개념",type:"선택",
+   q:"내용타당도(Content Validity)의 정의로 옳은 것은?",
+   choices:["문항이 측정하려는 내용을 충분히 대표하는지 확인","외부 기준과 얼마나 잘 맞는지 확인","눈에 보이지 않는 심리 개념을 얼마나 잘 측정하는지","비슷한 검사와 높은 상관을 보이는지"],ans:"문항이 측정하려는 내용을 충분히 대표하는지 확인",
+   hint:"우울 척도에 기분·의욕·수면·무가치감 문항이 골고루 포함"},
+  {id:75,cat:"통계 개념",type:"빈칸",
+   q:"왜도(Skewness)는 분포가 <b>[ ]</b>으로 치우친 정도이며, 첨도(Kurtosis)는 분포가 얼마나 <b>[ ]</b>하거나 평평한지를 나타낸다.",
+   blanks:["한쪽","뾰족"],hint:"양의 왜도=오른쪽 꼬리가 김"},
+
+  // ── 재구성 척도 ────────────────────────────────────────
+  {id:76,cat:"재구성 척도",type:"빈칸",
+   q:"재구성 임상척도(RC) 개발 핵심 절차: ① <b>[ ]</b> 척도 개발 → ② 의기소침 요인 제거(FA) → ③ <b>[ ]</b> 제작 → ④ RC 척도 도출",
+   blanks:["의기소침(Demoralization)","씨앗척도(seed scale)"],hint:"공통 요인 제거 후 개별 특성 강조"},
+  {id:77,cat:"재구성 척도",type:"선택",
+   q:"RC 척도의 특징으로 옳지 않은 것은?",
+   choices:["K교정 점수 반영","65T 이상을 높은 점수로 해석","척도 간 문항 중복 없음","척도명이 현상 기술 방식"],ans:"K교정 점수 반영",
+   hint:"RC는 K교정 미반영"},
+  {id:78,cat:"재구성 척도",type:"빈칸",
+   q:"RC 척도는 표준 임상척도에 비해 척도 간 <b>[ ]</b>이 없으며, 표준 임상척도보다 <b>[ ]</b> 문항으로 구성된다.",
+   blanks:["문항 중복","적은"],hint:"동질적이고 변별력 높음"},
+  {id:79,cat:"재구성 척도",type:"선택",
+   q:"표준 임상척도(C)는 상승했지만 RC 척도는 상승하지 않은 경우(#3)의 해석은?",
+   choices:["의기소침(Demoralization)의 영향으로 상승했을 가능성","개별 특성이 강함","Faking bad","무선반응"],ans:"의기소침(Demoralization)의 영향으로 상승했을 가능성",
+   hint:"공통 고통 요인이 제거되면 척도가 상승하지 않을 수 있음"},
+  {id:80,cat:"재구성 척도",type:"빈칸",
+   q:"RC 척도 개발의 목적은 MMPI-2 임상척도의 <b>[ ]</b> 특성을 유지하면서도 <b>[ ]</b>을 증가시키는 것이다.",
+   blanks:["핵심적 기술적","변별력"],hint:"척도 간 중복·다차원성 문제 해결"},
+
+  // ── 개발 역사 ──────────────────────────────────────────
+  {id:81,cat:"개발 역사",type:"빈칸",
+   q:"MMPI는 <b>[ ]</b>과 McKinley가 <b>[ ]</b>년에 개발 착수하였으며, <b>[ ]</b>년에 원판이 출판되었다.",
+   blanks:["Hathaway","1939","1943"],hint:"Minnesota Multiphasic Personality Inventory"},
+  {id:82,cat:"개발 역사",type:"선택",
+   q:"MMPI 원판의 규준집단 중 임상집단은 몇 명이었나?",
+   choices:["221명","504명","724명","2600명"],ans:"221명",
+   hint:"8개 정신과적 범주, 각 집단 약 50명"},
+  {id:83,cat:"개발 역사",type:"빈칸",
+   q:"MMPI-2는 <b>[ ]</b>년에 출판되었으며, <b>[ ]</b>개 검사 지역에서 총 <b>[ ]</b>명의 자료가 사용되었다.",
+   blanks:["1989","7","2600"],hint:"재표준화 위원회 1982년 구성"},
+  {id:84,cat:"개발 역사",type:"선택",
+   q:"한국판 MMPI-2/MMPI-A가 발표된 연도는?",
+   choices:["2005년","1989년","1963년","1999년"],ans:"2005년",
+   hint:"2000년 인구·주택 총조사 기준"},
+  {id:85,cat:"개발 역사",type:"빈칸",
+   q:"MMPI 원판 개발 방법은 <b>[ ]</b>(empirical criterion keying)으로, 임상집단과 비교집단을 <b>[ ]</b>하는 데 유용한 문항들을 선정하였다.",
+   blanks:["경험적 준거방식","변별"],hint:"이론적 이해보다 경험적 유용성 중심"},
+  {id:86,cat:"개발 역사",type:"선택",
+   q:"MMPI-A 출판 연도와 문항 수는?",
+   choices:["1992년, 478문항","1989년, 567문항","1992년, 370문항","2005년, 478문항"],ans:"1992년, 478문항",
+   hint:"13~18세 청소년용, 전반부 350문항으로 임상척도 산출 가능"},
+  {id:87,cat:"개발 역사",type:"빈칸",
+   q:"MMPI 원판 개정의 필요성으로는 새로운 <b>[ ]</b> 필요, 구식·성차별적 문항 문제, <b>[ ]</b>(예: 자살·약물) 관련 문항 부재 등이 있었다.",
+   blanks:["규준","중요 성격특성"],hint:"원판 1943년 이래 한 차례도 개정 없었음"},
+  {id:88,cat:"개발 역사",type:"선택",
+   q:"MMPI 원판 규준집단의 주요 문제는?",
+   choices:["편의 표집으로 대표성이 떨어짐","임상집단이 포함되지 않음","문항 수가 너무 적음","타당도 척도가 없음"],ans:"편의 표집으로 대표성이 떨어짐",
+   hint:"주로 미네소타 거주 백인, 35세 기혼자 중심"},
+
+  // ── 장단점·논쟁 ──────────────────────────────────────
+  {id:89,cat:"장단점·논쟁",type:"선택",
+   q:"MMPI의 다차원성 문제가 야기하는 주요 해석 어려움은?",
+   choices:["척도 점수 상승 원인이 무엇인지 판단하기 어려움","문항 수가 너무 많음","재검사 신뢰도가 낮음","채점이 복잡함"],ans:"척도 점수 상승 원인이 무엇인지 판단하기 어려움",
+   hint:"우울 때문인지, 불안 때문인지, 스트레스 때문인지 분리 어려움"},
+  {id:90,cat:"장단점·논쟁",type:"빈칸",
+   q:"MMPI가 다른 표준화 검사나 <b>[ ]</b>검사보다 더 정확하다는 주장이 있으며, <b>[ ]</b>타입을 해석함으로써 추론의 정확성을 높일 수 있다.",
+   blanks:["투사","코드"],hint:"광범위한 타당도 연구 누적"},
+  {id:91,cat:"장단점·논쟁",type:"선택",
+   q:"중간 정도의 점수 상승(60~65T)을 해석할 때 특히 주의해야 하는 이유는?",
+   choices:["정상군의 유의하지 않은 변동일 수 있음","반드시 임상 범위로 해석해야 해서","척도가 무효여서","K교정이 필요해서"],ans:"정상군의 유의하지 않은 변동일 수 있음",
+   hint:"이형집단(Bimodal) 구별이 원래 목적"},
+  {id:92,cat:"장단점·논쟁",type:"빈칸",
+   q:"객관적 검사의 장점은 <b>[ ]</b>/타당도가 높고 상대적 평가에 유용하지만, 단점으로 방어가 <b>[ ]</b>다는 점이 있다.",
+   blanks:["신뢰도","쉽"],hint:"투사검사는 방어가 어렵지만 신뢰도·타당도가 낮음"},
+  {id:93,cat:"장단점·논쟁",type:"선택",
+   q:"MMPI 해석 시 의뢰사유·현재 상황·과거력과 함께 반드시 고려해야 할 요소가 아닌 것은?",
+   choices:["수검자의 혈액형","종교적 배경","교육 수준","사회경제적 지위(SES)"],ans:"수검자의 혈액형",
+   hint:"직업·종교·교육·SES 모두 중요"},
+  {id:94,cat:"장단점·논쟁",type:"빈칸",
+   q:"MMPI 해석 시 '내담자의 문제에 대한 <b>[ ]</b> 정보를 제공하는 것이지 <b>[ ]</b> 진술을 해주지는 않는다'는 점을 유의해야 한다.",
+   blanks:["가설적","결정적"],hint:"해석집 내용에 꼭 맞는 내담자는 거의 없음"},
+
+  // ── 내용 척도 ─────────────────────────────────────────
+  {id:95,cat:"내용 척도",type:"빈칸",
+   q:"내용 척도 TRT는 <b>[ ]</b> 지표를 나타내며, WRK는 <b>[ ]</b> 곤란을 측정한다.",
+   blanks:["부정적 치료","직업적"],hint:"내용 척도 15개: ANX·FRS·OBS·DEP·HEA·BIZ·ANG·CYN·ASP·TPA·LSE·SOD·FAM·WRK·TRT"},
+  {id:96,cat:"내용 척도",type:"선택",
+   q:"내용 척도 BIZ가 높을 때 시사하는 것은?",
+   choices:["기태적 정신상태","낮은 자존감","사회적 불편감","분노"],ans:"기태적 정신상태",
+   hint:"Bizarre Mentation, 정신병적 사고"},
+  {id:97,cat:"내용 척도",type:"빈칸",
+   q:"내용 척도 DEP는 <b>[ ]</b>을, LSE는 <b>[ ]</b>을, SOD는 <b>[ ]</b>을 측정한다.",
+   blanks:["우울","낮은 자존감","사회적 불편감"],hint:"내용척도는 안면 타당도가 높아 왜곡 가능"},
+  {id:98,cat:"내용 척도",type:"선택",
+   q:"내용척도 해석 시 내용소척도는 해당 내용척도가 몇 T점수 이상일 때만 해석하나?",
+   choices:["60T","65T","70T","55T"],ans:"60T",
+   hint:"내용척도 자체는 65T 이상에서 해석"},
+  {id:99,cat:"내용 척도",type:"빈칸",
+   q:"내용척도 ANX는 <b>[ ]</b>을, FRS는 <b>[ ]</b>을, OBS는 <b>[ ]</b>을 측정한다.",
+   blanks:["불안","공포","강박성"],hint:"내용 척도 목록 첫 세 가지"},
+  {id:100,cat:"내용 척도",type:"선택",
+   q:"내용척도 TPA(A 유형 행동)가 높을 때의 특징과 거리가 먼 것은?",
+   choices:["느긋하고 여유로운 태도","시간 압박감","경쟁적 태도","분노와 적개심"],ans:"느긋하고 여유로운 태도",
+   hint:"Type A = 경쟁적·시간 압박·적개심"},
+
+  // ── PSY-5·보충 척도 ────────────────────────────────────
+  {id:101,cat:"PSY-5·보충",type:"빈칸",
+   q:"PSY-5 척도는 <b>[ ]</b>이론과 '정상' 성격 이론에서 파생되었으며, 임상 계획·의사소통·<b>[ ]</b>에 관련된 5개 광범위 성격 영역을 다룬다.",
+   blanks:["성격장애","개입"],hint:"5 Psychopathology Factor Scales"},
+  {id:102,cat:"PSY-5·보충",type:"선택",
+   q:"보충척도(Supplementary Scales)를 활용하는 방법으로 가장 옳은 것은?",
+   choices:["임상척도의 한계를 보완하는 증분타당도로 활용","임상척도 대신 단독 해석","타당도 척도보다 먼저 해석","코드타입 대신 활용"],ans:"임상척도의 한계를 보완하는 증분타당도로 활용",
+   hint:"추가 예측력, 임상척도보다 관련 특징과 더 높은 상관"},
+
+  // ── 종합 응용 문제 ─────────────────────────────────────
+  {id:103,cat:"종합 응용",type:"빈칸",
+   q:"MMPI-2에서 TRIN이 80F 이상이고 L 척도가 높을 때, L의 상승은 과소 보고보다는 <b>[ ]</b> 경향성을 반영하는 것으로 해석한다.",
+   blanks:["아니다"],hint:"TRIN F 방향 상승 → 아니다 경향성"},
+  {id:104,cat:"종합 응용",type:"선택",
+   q:"다음 중 F(P) 척도가 100T 이상이고 VRIN이 80T 미만일 때의 해석으로 옳은 것은?",
+   choices:["증상의 의도적 과장(Faking bad)","불성실 응답","방어적 태도","심각한 정신병리"],ans:"증상의 의도적 과장(Faking bad)",
+   hint:"VRIN 80 이상이면 불성실 응답 → 해석 불가"},
+  {id:105,cat:"종합 응용",type:"빈칸",
+   q:"MMPI-2 임상척도 중 K교정 적용 시: 1번에는 K의 <b>[ ]</b>배, 4번에는 K의 <b>[ ]</b>배, 9번에는 K의 <b>[ ]</b>배를 더한다.",
+   blanks:["0.5","0.4","0.2"],hint:"K교정 가중치는 척도마다 다름 (1=0.5K, 4=0.4K, 7=1K, 8=1K, 9=0.2K)"},
+  {id:106,cat:"종합 응용",type:"선택",
+   q:"다음 중 MMPI 해석에서 '긍정심리학적 해석'을 적용할 때 주의해야 할 점은?",
+   choices:["내담자의 문제를 희석시키지 않아야 함","무조건 긍정적으로 해석해야 함","점수가 낮은 척도에만 적용","타당도 척도와 무관하게 적용"],ans:"내담자의 문제를 희석시키지 않아야 함",
+   hint:"목적이 분명하고 '부분적으로 진실된' 것이어야 함"},
+  {id:107,cat:"종합 응용",type:"빈칸",
+   q:"Harris-Lingoes 소척도는 임상척도의 <b>[ ]</b>성 문제를 해결하기 위해 개발되었으며, 해당 척도에서 높은 점수를 얻은 이유에 대한 '<b>[ ]</b>'을 설정하는 데 사용된다.",
+   blanks:["다차원","가설"],hint:"65-65 rule: 임상척도 65T 이상 + 소척도 65T 이상"},
+  {id:108,cat:"종합 응용",type:"선택",
+   q:"결과지에서 프로파일 상승도(Profile Elevation)가 전반적으로 높을 때 시사하는 것이 아닌 것은?",
+   choices:["반드시 심각한 정신질환","심각한 정서적 고통","기능 저하","도움 요청 의도"],ans:"반드시 심각한 정신질환",
+   hint:"Faking bad, 무선반응, 심각한 정신병리 모두 가능"},
+  {id:109,cat:"종합 응용",type:"빈칸",
+   q:"Conversion V(전환 V)는 <b>[ ]</b>번이 높고 <b>[ ]</b>번이 낮으며 <b>[ ]</b>번이 높은 형태이며, Paranoid Valley는 <b>[ ]</b>번이 낮고 <b>[ ]</b>·<b>[ ]</b>번이 높은 형태이다.",
+   blanks:["1","2","3","7","6","8"],hint:"전환V=신경증적 삼각형, 편집 계곡=Psychotic slope"},
+  {id:110,cat:"종합 응용",type:"선택",
+   q:"MMPI-2 결과 해석 시 '정의된(Defined) 코드타입'의 의미는?",
+   choices:["1·2위 척도와 3위 척도 간 T점수 차이가 5점 이상","모든 척도가 65T 이상","척도 5·0번을 포함한 코드타입","임상척도 전체가 상승"],ans:"1·2위 척도와 3위 척도 간 T점수 차이가 5점 이상",
+   hint:"정의되지 않으면 여러 조합을 염두에 두고 해석"},
+  {id:111,cat:"종합 응용",type:"빈칸",
+   q:"MMPI-2의 국내 적용 시 미국 <b>[ ]</b> T점수 산출식을 적용하며, 동일한 T점수라도 미국과 국내의 <b>[ ]</b>가 다를 수 있다.",
+   blanks:["동형","백분위"],hint:"높은 점수대(75점 이상)에서 더 높은 동형 T점수"},
+  {id:112,cat:"종합 응용",type:"선택",
+   q:"MMPI 검사 수행 시간이 지나치게 짧을 때 의심해야 할 것은?",
+   choices:["불성실·충동성","심각한 우울증","뇌 손상","강박적 우유부단"],ans:"불성실·충동성",
+   hint:"시간 길면: 우울·정신증·뇌손상·강박·독해력부족"},
+  {id:113,cat:"종합 응용",type:"빈칸",
+   q:"MMPI에서 표준화(Standardization)란 검사 <b>[ ]</b>, <b>[ ]</b>, 해석 방식을 일정하게 만드는 과정으로, 누구나 동일한 방식으로 실시·채점해야 비교 가능성이 유지된다.",
+   blanks:["실시","채점"],hint:"표준화가 깨지면 규준 적용 의미 없음"},
+  {id:114,cat:"종합 응용",type:"선택",
+   q:"증분타당도(Incremental Validity)의 의미는?",
+   choices:["기존 척도에 더해 추가적인 예측력을 제공","검사 내용의 대표성","척도 간 상관","검사 재실시 시 안정성"],ans:"기존 척도에 더해 추가적인 예측력을 제공",
+   hint:"내용척도의 장점 중 하나"},
+  {id:115,cat:"종합 응용",type:"빈칸",
+   q:"타당도 척도에서 K 척도가 50점 이상이면서 F 척도가 K와 같거나 그 이상일 때의 타당도 형태는 '<b>[ ]</b> & 높은 K' 형태로, 좋은 <b>[ ]</b>를 가진 사람으로 해석된다.",
+   blanks:["뒤집힌 V","자아강도"],hint:"F≥K이지만 K도 높음"},
+  {id:116,cat:"종합 응용",type:"선택",
+   q:"내용척도 CYN(냉소적 태도)이 높은 수검자에 대한 해석으로 옳은 것은?",
+   choices:["타인의 동기를 부정적으로 의심하는 태도","낮은 자존감","신체 증상 호소","사회적 불편감"],ans:"타인의 동기를 부정적으로 의심하는 태도",
+   hint:"냉소적 태도 = 인간 본성에 대한 불신"},
+  {id:117,cat:"종합 응용",type:"빈칸",
+   q:"MMPI 해석은 가설적 정보를 제공하는 것이므로, 의뢰사유·현재 상황·과거력·직업·종교적 배경·교육·<b>[ ]</b>를 함께 고려해야 한다.",
+   blanks:["SES(사회경제적 지위)"],hint:"프로파일 해석은 항상 개인 맥락과 함께"},
+  {id:118,cat:"종합 응용",type:"선택",
+   q:"다음 중 MMPI 해석의 한계를 가장 잘 설명한 것은?",
+   choices:["같은 점수도 다른 의미를 가질 수 있음","타당도와 신뢰도가 매우 낮음","진단 확정에 사용 불가","코드타입 해석이 불가능함"],ans:"같은 점수도 다른 의미를 가질 수 있음",
+   hint:"객관적 검사의 한계: 방어 쉬움, 동일 점수 다른 의미"},
+  {id:119,cat:"종합 응용",type:"빈칸",
+   q:"PSY-5 척도는 성격장애 이론과 정상 성격 이론에서 파생되어 <b>[ ]</b>개의 광범위 성격 영역을 다루며, 임상적 <b>[ ]</b>·의사소통·개입에 활용된다.",
+   blanks:["5","계획"],hint:"AGGR·PSYC·DISC·NEGE·INTR 5요인"},
+  {id:120,cat:"종합 응용",type:"선택",
+   q:"MMPI-2-RF(재구성형)의 주요 특징으로 옳지 않은 것은?",
+   choices:["K교정 점수를 반영","척도 간 중복 최소화","비교적 분리된 차원으로 재구성","338문항으로 구성"],ans:"K교정 점수 반영",
+   hint:"MMPI-2-RF는 K교정 미반영, RC 척도 기반"},
+];
+
+let state = {};
+let activeFilter = '전체';
+const cats = ['전체',...new Set(QS.map(q=>q.cat))];
+
+function initState(){
+  state = {};
+  QS.forEach(q=>{state[q.id]={answered:false,correct:null};});
+}
+
+function updateStats(){
+  const all = QS.filter(q=>activeFilter==='전체'||q.cat===activeFilter);
+  const done = all.filter(q=>state[q.id].answered);
+  const correct = done.filter(q=>state[q.id].correct).length;
+  const wrong = done.filter(q=>!state[q.id].correct).length;
+  document.getElementById('sc').textContent=correct;
+  document.getElementById('wc').textContent=wrong;
+  document.getElementById('rc').textContent=all.length-done.length;
+  document.getElementById('prog').style.width=all.length?(Math.round(done.length/all.length*100)+'%'):'0%';
+}
+
+function buildFilters(){
+  const el=document.getElementById('filters');
+  el.innerHTML=cats.map(c=>`<button class="filter-btn ${c===activeFilter?'active':''}" onclick="setFilter('${c}')">${c}${c==='전체'?` (${QS.length})`:`(${QS.filter(q=>q.cat===c).length})`}</button>`).join('');
+}
+
+function setFilter(cat){
+  activeFilter=cat;
+  buildFilters();
+  renderAll();
+  updateStats();
+}
+
+function normalizeAns(s){
+  return s.toLowerCase().replace(/[\s\(\)\[\]·,、。]/g,'');
+}
+
+function checkBlank(id){
+  const q=QS.find(q=>q.id===id);
+  const vals=q.blanks.map((_,i)=>{
+    const el=document.getElementById(`inp-${id}-${i}`);
+    return el?el.value.trim():'';
+  });
+  const correct=q.blanks.every((ans,i)=>{
+    const v=normalizeAns(vals[i]);
+    const a=normalizeAns(ans);
+    return v===a||a.includes(v)||v.includes(a);
+  });
+  state[id]={answered:true,correct};
+  q.blanks.forEach((_,i)=>{
+    const el=document.getElementById(`inp-${id}-${i}`);
+    if(el){el.classList.add(correct?'inp-ok':'inp-ng');el.disabled=true;}
+  });
+  showFeedback(id,correct,q.hint,q.blanks);
+  document.getElementById(`check-${id}`).style.display='none';
+  document.getElementById(`card-${id}`).className=`card ${correct?'answered-correct':'answered-wrong'}`;
+  updateStats();
+}
+
+function checkChoice(id,choice){
+  const q=QS.find(q=>q.id===id);
+  const correct=choice===q.ans;
+  state[id]={answered:true,correct};
+  document.querySelectorAll(`.ch-${id}`).forEach(btn=>{
+    btn.disabled=true;
+    if(btn.dataset.val===q.ans)btn.classList.add('reveal');
+    if(btn.dataset.val===choice&&!correct)btn.classList.add('selected-ng');
+    if(btn.dataset.val===choice&&correct)btn.classList.add('selected-ok');
+  });
+  showFeedback(id,correct,q.hint,[q.ans]);
+  document.getElementById(`card-${id}`).className=`card ${correct?'answered-correct':'answered-wrong'}`;
+  updateStats();
+}
+
+function showFeedback(id,correct,hint,answers){
+  const fb=document.getElementById(`fb-${id}`);
+  if(!fb)return;
+  const ansHtml=answers.map(a=>`<span class="ans-badge">${a}</span>`).join(', ');
+  fb.className=`feedback ${correct?'ok':'ng'}`;
+  fb.innerHTML=correct
+    ?`✓ 정답!${hint?`<div class="hint-text">${hint}</div>`:''}`
+    :`✗ 정답: ${ansHtml}${hint?`<div class="hint-text">${hint}</div>`:''}`;
+  fb.style.display='block';
+}
+
+function renderCard(q){
+  const s=state[q.id];
+  const answered=s.answered;
+  const cardCls=answered?(s.correct?'card answered-correct':'card answered-wrong'):'card';
+
+  let qHtml=q.q;
+  let inputHtml='';
+
+  if(q.type==='빈칸'){
+    let idx=0;
+    qHtml=q.q.replace(/<b>\[ \]<\/b>/g,()=>{
+      const marker=`<span class="blank-marker">  </span>`;
+      idx++;
+      return marker;
+    });
+    if(!answered){
+      inputHtml=`<div class="input-area">
+        ${q.blanks.map((_,i)=>`<div class="inp-row">
+          ${q.blanks.length>1?`<span class="inp-label">빈칸${i+1}</span>`:''}
+          <input class="q-input" id="inp-${q.id}-${i}" placeholder="${i+1}번 빈칸 입력" autocomplete="off" onkeydown="if(event.key==='Enter'){if(${i}===${q.blanks.length-1})checkBlank(${q.id});else{const nx=document.getElementById('inp-${q.id}-${i+1}');if(nx)nx.focus();}}" />
+        </div>`).join('')}
+        <button class="check-btn" id="check-${q.id}" onclick="checkBlank(${q.id})">정답 확인</button>
+      </div>`;
+    }
+  } else {
+    const shuffled=[...q.choices].sort(()=>Math.random()-.5);
+    if(!answered){
+      inputHtml=`<div class="choices">${shuffled.map(c=>`<button class="choice-btn ch-${q.id}" data-val="${c}" onclick="checkChoice(${q.id},'${c.replace(/'/g,"\\'")}')">
+        ${c}
+      </button>`).join('')}</div>`;
+    }
+  }
+
+  return `<div class="${cardCls}" id="card-${q.id}">
+    <div class="card-meta">
+      <span class="tag tag-cat">${q.cat}</span>
+      <span class="tag tag-type">${q.type}</span>
+      <span class="qnum">Q${q.id}</span>
+    </div>
+    <div class="question">${qHtml}</div>
+    ${inputHtml}
+    <div class="feedback" id="fb-${q.id}" style="display:none"></div>
+  </div>`;
+}
+
+function renderAll(){
+  const filtered=QS.filter(q=>activeFilter==='전체'||q.cat===activeFilter);
+  const list=document.getElementById('list');
+  if(!filtered.length){list.innerHTML='<div class="empty-msg">해당 카테고리의 문제가 없습니다.</div>';return;}
+  list.innerHTML=filtered.map(renderCard).join('');
+}
+
+function scrollToFirst(){
+  document.getElementById(`card-${(QS.filter(q=>activeFilter==='전체'||q.cat===activeFilter)[0]||QS[0]).id}`)?.scrollIntoView({behavior:'smooth',block:'start'});
+}
+
+function scrollToNext(){
+  const filtered=QS.filter(q=>activeFilter==='전체'||q.cat===activeFilter);
+  const next=filtered.find(q=>!state[q.id].answered);
+  if(next){
+    document.getElementById(`card-${next.id}`)?.scrollIntoView({behavior:'smooth',block:'start'});
+  } else {
+    alert('🎉 모든 문제를 풀었어요!');
+  }
+}
+
+function confirmReset(){
+  if(confirm('모든 답을 초기화할까요?')){
+    initState();
+    renderAll();
+    updateStats();
+    window.scrollTo({top:0,behavior:'smooth'});
+  }
+}
+
+initState();
+buildFilters();
+renderAll();
+updateStats();
+</script>
+</body>
+</html>
