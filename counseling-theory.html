@@ -1,0 +1,657 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>상담이론 및 실제</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;700;900&family=Noto+Sans+KR:wght@400;500;700&display=swap');
+
+:root {
+  --bg: #f7f4ef;
+  --paper: #fffefb;
+  --ink: #1c1a17;
+  --muted: #7a7268;
+  --line: #e3ddd4;
+  --accent: #2d5016;
+  --accent2: #7c4d00;
+  --soft: #eef3e8;
+  --warm: #fdf6ec;
+  --radius: 16px;
+  --shadow: 0 4px 24px rgba(28,26,23,.08);
+  /* 토론거리 */
+  --disc: #3d2b6b;
+  --disc-soft: #f8f7fa;
+  --disc-line: #a898d4;
+  /* 개념정리 */
+  --sum: #7c4d00;
+  --sum-soft: #fdf6ec;
+  --sum-line: #d4a96a;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: 'Noto Sans KR', sans-serif;
+  background: var(--bg);
+  color: var(--ink);
+  line-height: 1.65;
+  min-height: 100vh;
+}
+
+/* ── Header ── */
+header {
+  background: var(--ink);
+  color: #fff;
+  padding: 28px 24px 22px;
+  text-align: center;
+}
+.header-back {
+  display: inline-block;
+  margin-bottom: 14px;
+  font-size: 12px;
+  font-weight: 700;
+  color: rgba(255,255,255,.45);
+  text-decoration: none;
+  letter-spacing: .06em;
+  transition: color .15s;
+}
+.header-back:hover { color: rgba(255,255,255,.8); }
+header h1 {
+  font-family: 'Noto Serif KR', serif;
+  font-size: clamp(20px, 4vw, 34px);
+  letter-spacing: -.03em;
+}
+
+/* ── 탭 네비 (3개: 기출문제 / 개념정리 / 토론거리) ── */
+.mode-nav {
+  background: var(--paper);
+  border-bottom: 1px solid var(--line);
+  display: flex;
+  justify-content: center;
+  gap: 0;
+  position: sticky;
+  top: 0;
+  z-index: 40;
+}
+.mode-btn {
+  flex: 1;
+  max-width: 180px;
+  padding: 12px 8px;
+  border: none;
+  border-bottom: 3px solid transparent;
+  background: transparent;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--muted);
+  cursor: pointer;
+  transition: all .15s;
+  touch-action: manipulation;
+}
+.mode-btn:hover { color: var(--ink); }
+.mode-btn.active-quiz  { color: var(--accent); border-bottom-color: var(--accent); }
+.mode-btn.active-sum   { color: var(--sum);    border-bottom-color: var(--sum); }
+.mode-btn.active-disc  { color: var(--disc);   border-bottom-color: var(--disc); }
+
+/* ── 챕터 네비 ── */
+.chapter-nav {
+  background: var(--paper);
+  border-bottom: 1px solid var(--line);
+  position: sticky;
+  top: 47px;
+  z-index: 30;
+  padding: 10px 12px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+}
+
+.ch-btn {
+  flex: 0 0 auto;
+  border: 1.5px solid var(--line);
+  background: var(--paper);
+  color: var(--muted);
+  border-radius: 999px;
+  padding: 5px 11px;
+  font-size: 11.5px;
+  font-weight: 700;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all .18s;
+  white-space: nowrap;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+.ch-btn:hover { border-color: var(--accent); color: var(--accent); }
+.ch-btn.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+
+/* 토론거리 모드일 때 챕터 버튼 */
+.disc-mode .ch-btn:hover { border-color: var(--disc); color: var(--disc); }
+.disc-mode .ch-btn.active { background: var(--disc); border-color: var(--disc); color: #fff; }
+
+/* 개념정리 모드일 때 챕터 버튼 */
+.sum-mode .ch-btn:hover { border-color: var(--sum); color: var(--sum); }
+.sum-mode .ch-btn.active { background: var(--sum); border-color: var(--sum); color: #fff; }
+
+/* ── Layout ── */
+.wrap { max-width: 860px; margin: 0 auto; padding: 32px 16px 80px; }
+
+/* 모드별 섹션 */
+.mode-panel { display: none; }
+.mode-panel.visible { display: block; }
+
+.chapter-section { display: none; }
+.chapter-section.visible { display: block; }
+
+/* ── Chapter Header ── */
+.chapter-header {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  margin-bottom: 24px;
+  padding-bottom: 14px;
+  border-bottom: 2px solid var(--ink);
+}
+.chapter-header h2 {
+  font-family: 'Noto Serif KR', serif;
+  font-size: 22px;
+  letter-spacing: -.04em;
+}
+.ch-count {
+  font-size: 13px;
+  color: var(--muted);
+  font-weight: 700;
+  background: var(--soft);
+  border-radius: 999px;
+  padding: 3px 10px;
+}
+
+/* ── 기출문제 카드 ── */
+.qcard {
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 20px 22px;
+  margin-bottom: 14px;
+  box-shadow: var(--shadow);
+}
+.q-num {
+  font-size: 11px;
+  font-weight: 900;
+  color: var(--muted);
+  letter-spacing: .08em;
+  margin-bottom: 8px;
+}
+.q-body {
+  font-size: 15px;
+  line-height: 1.75;
+  white-space: pre-wrap;
+  font-family: 'Noto Sans KR', sans-serif;
+  word-break: keep-all;
+  overflow-wrap: break-word;
+}
+.premise-box {
+  background: #f4f0e8;
+  border: 1px solid #d6cebc;
+  border-radius: 10px;
+  padding: 12px 16px;
+  margin: 10px 0;
+  font-size: 14px;
+  line-height: 1.8;
+  white-space: pre-wrap;
+  font-family: 'Noto Sans KR', sans-serif;
+  word-break: keep-all;
+  overflow-wrap: break-word;
+}
+.choices {
+  font-size: 15px;
+  line-height: 1.85;
+  white-space: pre-wrap;
+  font-family: 'Noto Sans KR', sans-serif;
+  word-break: keep-all;
+  overflow-wrap: break-word;
+  margin-top: 6px;
+}
+.answer-btn {
+  margin-top: 14px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  border-radius: 999px;
+  border: 1.5px solid var(--accent);
+  background: transparent;
+  color: var(--accent);
+  font-size: 13px;
+  font-weight: 700;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all .15s;
+  touch-action: manipulation;
+}
+.answer-btn:hover { background: var(--soft); }
+.answer-btn.open { background: var(--accent); color: #fff; }
+.answer-box {
+  display: none;
+  margin-top: 12px;
+  padding: 14px 16px;
+  background: var(--soft);
+  border-radius: 12px;
+  border: 1px solid #c8dbb8;
+  font-size: 14px;
+  line-height: 1.7;
+}
+.answer-box.visible { display: block; }
+.ans-label { font-weight: 900; color: var(--accent); font-size: 14px; margin-bottom: 6px; }
+
+/* ── 개념정리 카드 ── */
+.sum-card {
+  background: var(--sum-soft);
+  border: 1px solid var(--sum-line);
+  border-radius: var(--radius);
+  padding: 22px 22px 18px;
+  margin-bottom: 14px;
+  box-shadow: var(--shadow);
+  overflow: hidden;
+}
+.sum-card-title {
+  font-family: 'Noto Serif KR', serif;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--sum);
+  margin-bottom: 10px;
+  letter-spacing: -.02em;
+}
+.sum-card-body {
+  font-size: 14px;
+  line-height: 1.8;
+  color: var(--ink);
+  white-space: pre-wrap;
+  word-break: keep-all;
+  overflow-wrap: break-word;
+}
+.sum-placeholder {
+  color: var(--muted);
+  font-size: 14px;
+  font-style: italic;
+  padding: 40px 0;
+  text-align: center;
+}
+
+/* ── 토론거리 ── */
+.disc-card {
+  background: var(--disc-soft);
+  border: 1px solid var(--disc-line);
+  border-radius: var(--radius);
+  padding: 20px 22px;
+  margin-bottom: 14px;
+  box-shadow: var(--shadow);
+  overflow: hidden;
+  min-width: 0;
+}
+.disc-ch-label {
+  font-size: 11px;
+  font-weight: 900;
+  color: var(--disc);
+  letter-spacing: .08em;
+  margin-bottom: 10px;
+}
+.disc-topic {
+  font-family: 'Noto Sans KR', sans-serif;
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--ink);
+  line-height: 1.7;
+  margin-bottom: 10px;
+  word-break: keep-all;
+  overflow-wrap: break-word;
+}
+.disc-answer-btn {
+  margin-top: 10px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 15px;
+  border-radius: 999px;
+  border: 1.5px solid var(--disc);
+  background: transparent;
+  color: var(--disc);
+  font-size: 13px;
+  font-weight: 700;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all .15s;
+  touch-action: manipulation;
+}
+.disc-answer-btn:hover { background: var(--disc-soft); }
+.disc-answer-btn.open { background: var(--disc); color: #fff; }
+.disc-answer-box {
+  display: none;
+  margin-top: 10px;
+  padding: 14px 16px;
+  background: #fff;
+  border-radius: 12px;
+  border: 1px solid var(--disc-line);
+  font-size: 14px;
+  line-height: 1.75;
+  color: var(--ink);
+  white-space: pre-wrap;
+  word-break: keep-all;
+  overflow-wrap: break-word;
+}
+.disc-answer-box.visible { display: block; }
+.placeholder-note {
+  color: var(--muted);
+  font-size: 14px;
+  font-style: italic;
+  padding: 40px 0;
+  text-align: center;
+}
+
+footer {
+  text-align: center;
+  padding: 24px;
+  color: var(--muted);
+  font-size: 12px;
+  border-top: 1px solid var(--line);
+}
+
+@media (max-width: 480px) {
+  .ch-btn { padding: 4px 9px; font-size: 11px; }
+  .chapter-nav { padding: 8px 10px; gap: 5px; }
+  .mode-btn { font-size: 12px; padding: 11px 4px; }
+}
+</style>
+</head>
+<body>
+
+<header>
+  <a class="header-back" href="index.html">← Study Hub</a>
+  <h1>상담이론 및 실제</h1>
+</header>
+
+<!-- 모드 탭 -->
+<div class="mode-nav" id="modeNav">
+  <button class="mode-btn active-quiz" data-mode="quiz" onclick="switchMode('quiz')">기출문제</button>
+  <button class="mode-btn" data-mode="sum"  onclick="switchMode('sum')">개념정리</button>
+  <button class="mode-btn" data-mode="disc" onclick="switchMode('disc')">★ 토론거리</button>
+</div>
+
+<!-- 챕터 네비 -->
+<nav class="chapter-nav" id="chapterNav"></nav>
+
+<main class="wrap" id="mainWrap"></main>
+<footer>상담이론 및 실제 학습 자료</footer>
+
+<script>
+const chapters = [
+  { id: 'ch1',  label: '1. 정신분석' },
+  { id: 'ch2',  label: '2. 대상관계 & 자기심리학' },
+  { id: 'ch3',  label: '3. 개인심리학' },
+  { id: 'ch4',  label: '4. 분석심리학' },
+  { id: 'ch5',  label: '5. 행동주의' },
+  { id: 'ch6',  label: '6. 합리적정서행동치료' },
+  { id: 'ch7',  label: '7. 인지치료' },
+  { id: 'ch8',  label: '8. 인간중심상담' },
+  { id: 'ch9',  label: '9. 실존주의' },
+  { id: 'ch10', label: '10. 게슈탈트' },
+  { id: 'ch11', label: '11. 현실치료' },
+  { id: 'ch12', label: '12. 교류분석' },
+  { id: 'ch13', label: '13. 포스트모던' },
+  { id: 'ch14', label: '14. 가족치료' },
+];
+
+// ── 기출문제 데이터 (추후 채울 것) ──
+const quizData = {
+  ch1: [],  ch2: [],  ch3: [],  ch4: [],
+  ch5: [],  ch6: [],  ch7: [],  ch8: [],
+  ch9: [],  ch10: [], ch11: [], ch12: [],
+  ch13: [], ch14: [],
+};
+
+// ── 개념정리 데이터 (추후 채울 것) ──
+// { title: '소제목', body: '내용' } 형태
+const summaryData = {
+  ch1: [],  ch2: [],  ch3: [],  ch4: [],
+  ch5: [],  ch6: [],  ch7: [],  ch8: [],
+  ch9: [],  ch10: [], ch11: [], ch12: [],
+  ch13: [], ch14: [],
+};
+
+// ── 토론거리 데이터 (추후 채울 것) ──
+// { q: '질문', a: '답안' } 형태
+const discData = {
+  ch1: [],  ch2: [],  ch3: [],  ch4: [],
+  ch5: [],  ch6: [],  ch7: [],  ch8: [],
+  ch9: [],  ch10: [], ch11: [], ch12: [],
+  ch13: [], ch14: [],
+};
+
+// ── 현재 모드 ──
+let currentMode = 'quiz';
+let currentCh = 'ch1';
+
+// ── 모드 전환 ──
+function switchMode(mode) {
+  currentMode = mode;
+
+  // 탭 버튼 스타일
+  document.querySelectorAll('.mode-btn').forEach(b => {
+    b.classList.remove('active-quiz','active-sum','active-disc');
+  });
+  const activeBtn = document.querySelector(`.mode-btn[data-mode="${mode}"]`);
+  if (activeBtn) activeBtn.classList.add(`active-${mode}`);
+
+  // 챕터 네비 컬러 모드
+  const nav = document.getElementById('chapterNav');
+  nav.className = 'chapter-nav';
+  if (mode === 'disc') nav.classList.add('disc-mode');
+  if (mode === 'sum')  nav.classList.add('sum-mode');
+
+  renderChapter(currentCh);
+}
+
+// ── 챕터 전환 ──
+function switchChapter(chId) {
+  currentCh = chId;
+
+  document.querySelectorAll('.ch-btn').forEach(b => b.classList.remove('active'));
+  const btn = document.querySelector(`.ch-btn[data-ch="${chId}"]`);
+  if (btn) {
+    btn.classList.add('active');
+    btn.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+  }
+
+  renderChapter(chId);
+  document.getElementById('mainWrap').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+// ── 렌더링 ──
+function renderChapter(chId) {
+  const wrap = document.getElementById('mainWrap');
+  wrap.innerHTML = '';
+
+  const ch = chapters.find(c => c.id === chId);
+  if (!ch) return;
+
+  if (currentMode === 'quiz') renderQuiz(wrap, ch);
+  else if (currentMode === 'sum') renderSummary(wrap, ch);
+  else if (currentMode === 'disc') renderDisc(wrap, ch);
+}
+
+function chHeader(ch, countLabel) {
+  const div = document.createElement('div');
+  div.className = 'chapter-header';
+  div.innerHTML = `<h2>${ch.label}</h2><span class="ch-count">${countLabel}</span>`;
+  return div;
+}
+
+// ── 기출문제 렌더 ──
+function renderQuiz(wrap, ch) {
+  const items = quizData[ch.id] || [];
+  wrap.appendChild(chHeader(ch, items.length ? `${items.length}문항` : '준비 중'));
+
+  if (items.length === 0) {
+    const p = document.createElement('p');
+    p.className = 'placeholder-note';
+    p.textContent = '기출문제를 추가해주세요.';
+    wrap.appendChild(p);
+    return;
+  }
+
+  items.forEach((q, i) => {
+    const card = document.createElement('article');
+    card.className = 'qcard';
+
+    const num = document.createElement('div');
+    num.className = 'q-num';
+    num.textContent = `문제 ${i + 1}`;
+    card.appendChild(num);
+
+    // 제시문 파싱
+    const premiseRe = /\[PREMISE\]([\s\S]*?)\[\/PREMISE\]/g;
+    let lastIndex = 0, match;
+    const frag = document.createDocumentFragment();
+    while ((match = premiseRe.exec(q.text)) !== null) {
+      if (match.index > lastIndex) {
+        const pre = document.createElement('pre');
+        pre.className = 'q-body';
+        pre.textContent = q.text.slice(lastIndex, match.index);
+        frag.appendChild(pre);
+      }
+      const box = document.createElement('div');
+      box.className = 'premise-box';
+      box.textContent = match[1].trim();
+      frag.appendChild(box);
+      lastIndex = match.index + match[0].length;
+    }
+    if (lastIndex < q.text.length) {
+      const pre = document.createElement('pre');
+      pre.className = 'q-body choices';
+      pre.textContent = q.text.slice(lastIndex).trim();
+      frag.appendChild(pre);
+    }
+    if (!frag.childNodes.length) {
+      const pre = document.createElement('pre');
+      pre.className = 'q-body';
+      pre.textContent = q.text;
+      frag.appendChild(pre);
+    }
+    card.appendChild(frag);
+
+    const btn = document.createElement('button');
+    btn.className = 'answer-btn';
+    btn.innerHTML = '▶ 정답 및 해설 보기';
+    card.appendChild(btn);
+
+    const box = document.createElement('div');
+    box.className = 'answer-box';
+    box.innerHTML = `<div class="ans-label">정답: ${q.ans}</div><div>${q.exp}</div>`;
+    card.appendChild(box);
+
+    btn.addEventListener('click', () => {
+      const open = box.classList.contains('visible');
+      box.classList.toggle('visible', !open);
+      btn.classList.toggle('open', !open);
+      btn.innerHTML = open ? '▶ 정답 및 해설 보기' : '▼ 정답 및 해설 닫기';
+    });
+
+    wrap.appendChild(card);
+  });
+}
+
+// ── 개념정리 렌더 ──
+function renderSummary(wrap, ch) {
+  const items = summaryData[ch.id] || [];
+  wrap.appendChild(chHeader(ch, items.length ? `${items.length}항목` : '준비 중'));
+
+  if (items.length === 0) {
+    const p = document.createElement('p');
+    p.className = 'sum-placeholder';
+    p.textContent = '개념정리 내용을 추가해주세요.';
+    wrap.appendChild(p);
+    return;
+  }
+
+  items.forEach(item => {
+    const card = document.createElement('div');
+    card.className = 'sum-card';
+    const title = document.createElement('div');
+    title.className = 'sum-card-title';
+    title.textContent = item.title;
+    card.appendChild(title);
+    const body = document.createElement('div');
+    body.className = 'sum-card-body';
+    body.textContent = item.body;
+    card.appendChild(body);
+    wrap.appendChild(card);
+  });
+}
+
+// ── 토론거리 렌더 ──
+function renderDisc(wrap, ch) {
+  const items = discData[ch.id] || [];
+  wrap.appendChild(chHeader(ch, items.length ? `${items.length}문항` : '준비 중'));
+
+  if (items.length === 0) {
+    const p = document.createElement('p');
+    p.className = 'placeholder-note';
+    p.textContent = '토론 주제를 추가해주세요.';
+    wrap.appendChild(p);
+    return;
+  }
+
+  items.forEach((t, i) => {
+    const card = document.createElement('div');
+    card.className = 'disc-card';
+
+    const lbl = document.createElement('div');
+    lbl.className = 'disc-ch-label';
+    lbl.textContent = `토론 ${i + 1}`;
+    card.appendChild(lbl);
+
+    const topic = document.createElement('div');
+    topic.className = 'disc-topic';
+    topic.textContent = t.q;
+    card.appendChild(topic);
+
+    const aBtn = document.createElement('button');
+    aBtn.className = 'disc-answer-btn';
+    aBtn.innerHTML = '▶ 논의 포인트 보기';
+    card.appendChild(aBtn);
+
+    const aBox = document.createElement('div');
+    aBox.className = 'disc-answer-box';
+    aBox.textContent = t.a;
+    card.appendChild(aBox);
+
+    aBtn.addEventListener('click', () => {
+      const open = aBox.classList.contains('visible');
+      aBox.classList.toggle('visible', !open);
+      aBtn.classList.toggle('open', !open);
+      aBtn.innerHTML = open ? '▶ 논의 포인트 보기' : '▼ 논의 포인트 닫기';
+    });
+
+    wrap.appendChild(card);
+  });
+}
+
+// ── 챕터 네비 생성 ──
+const nav = document.getElementById('chapterNav');
+chapters.forEach(ch => {
+  const btn = document.createElement('button');
+  btn.className = 'ch-btn';
+  btn.dataset.ch = ch.id;
+  btn.textContent = ch.label;
+  btn.addEventListener('click', () => switchChapter(ch.id));
+  nav.appendChild(btn);
+});
+
+// 초기 렌더
+switchChapter('ch1');
+</script>
+</body>
+</html>
