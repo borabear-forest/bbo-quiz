@@ -1,0 +1,356 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>청소년활동론</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;700;900&family=Noto+Sans+KR:wght@400;500;700&display=swap');
+
+:root {
+  --bg: #f7f4ef;
+  --paper: #fffefb;
+  --ink: #1c1a17;
+  --muted: #7a7268;
+  --line: #e3ddd4;
+  --accent: #1a3258;
+  --soft: #eaeff6;
+  --warm: #fdf6ec;
+  --radius: 16px;
+  --shadow: 0 4px 24px rgba(28,26,23,.08);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: 'Noto Sans KR', sans-serif;
+  background: var(--bg);
+  color: var(--ink);
+  line-height: 1.65;
+  min-height: 100vh;
+}
+
+/* ── Header ── */
+header {
+  background: var(--ink);
+  color: #fff;
+  padding: 24px 24px 20px;
+  text-align: center;
+}
+.header-back {
+  display: inline-block;
+  margin-bottom: 10px;
+  font-size: 12px;
+  font-weight: 700;
+  color: rgba(255,255,255,.45);
+  text-decoration: none;
+  letter-spacing: .06em;
+  transition: color .15s;
+}
+.header-back:hover { color: rgba(255,255,255,.8); }
+header h1 {
+  font-family: 'Noto Serif KR', serif;
+  font-size: clamp(18px, 3.5vw, 28px);
+  letter-spacing: -.03em;
+}
+.header-sub {
+  font-size: 12px;
+  color: rgba(255,255,255,.4);
+  margin-top: 4px;
+  letter-spacing: .04em;
+}
+
+/* ── 목차 페이지 ── */
+.toc-wrap {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 36px 16px 80px;
+}
+.toc-title {
+  font-family: 'Noto Serif KR', serif;
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--ink);
+  margin-bottom: 20px;
+  padding-bottom: 12px;
+  border-bottom: 2px solid var(--ink);
+  letter-spacing: -.03em;
+}
+.toc-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 12px;
+}
+.toc-card {
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 18px 18px 16px;
+  cursor: pointer;
+  box-shadow: var(--shadow);
+  transition: transform .18s, box-shadow .18s, border-color .18s;
+  position: relative;
+  overflow: hidden;
+  text-align: left;
+  font-family: inherit;
+  color: inherit;
+  width: 100%;
+  border-left: 4px solid var(--accent);
+}
+.toc-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 32px rgba(28,26,23,.13);
+  border-color: var(--accent);
+}
+.toc-card-num {
+  font-size: 11px;
+  font-weight: 900;
+  color: var(--accent);
+  letter-spacing: .08em;
+  margin-bottom: 6px;
+}
+.toc-card-title {
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1.5;
+  color: var(--ink);
+  word-break: keep-all;
+}
+.toc-card-count {
+  margin-top: 10px;
+  font-size: 11px;
+  color: var(--muted);
+  font-weight: 700;
+}
+
+/* ── 문제 페이지 ── */
+.quiz-wrap {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 32px 16px 80px;
+  display: none;
+}
+.quiz-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 24px;
+  padding-bottom: 14px;
+  border-bottom: 2px solid var(--ink);
+}
+.quiz-back {
+  background: none;
+  border: 1.5px solid var(--line);
+  border-radius: 999px;
+  padding: 5px 12px;
+  font-size: 12px;
+  font-weight: 700;
+  font-family: inherit;
+  color: var(--muted);
+  cursor: pointer;
+  transition: all .15s;
+  white-space: nowrap;
+  touch-action: manipulation;
+}
+.quiz-back:hover { border-color: var(--accent); color: var(--accent); }
+.quiz-ch-title {
+  font-family: 'Noto Serif KR', serif;
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: -.04em;
+}
+
+/* ── 문제 카드 ── */
+.qcard {
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 20px 22px;
+  margin-bottom: 14px;
+  box-shadow: var(--shadow);
+}
+.q-num {
+  font-size: 11px;
+  font-weight: 900;
+  color: var(--muted);
+  letter-spacing: .08em;
+  margin-bottom: 8px;
+}
+.q-body {
+  font-size: 15px;
+  line-height: 1.75;
+  white-space: pre-wrap;
+  font-family: 'Noto Sans KR', sans-serif;
+  word-break: keep-all;
+  overflow-wrap: break-word;
+}
+.answer-btn {
+  margin-top: 14px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  border-radius: 999px;
+  border: 1.5px solid var(--accent);
+  background: transparent;
+  color: var(--accent);
+  font-size: 13px;
+  font-weight: 700;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all .15s;
+  touch-action: manipulation;
+}
+.answer-btn:hover { background: var(--soft); }
+.answer-btn.open { background: var(--accent); color: #fff; }
+.answer-box {
+  display: none;
+  margin-top: 12px;
+  padding: 14px 16px;
+  background: var(--soft);
+  border-radius: 12px;
+  border: 1px solid #a8bed8;
+  font-size: 14px;
+  line-height: 1.75;
+  white-space: pre-wrap;
+  word-break: keep-all;
+  overflow-wrap: break-word;
+}
+.answer-box.visible { display: block; }
+.ans-label { font-weight: 900; color: var(--accent); font-size: 14px; margin-bottom: 6px; }
+
+.placeholder-note {
+  color: var(--muted);
+  font-size: 14px;
+  font-style: italic;
+  padding: 40px 0;
+  text-align: center;
+}
+
+footer {
+  text-align: center;
+  padding: 24px;
+  color: var(--muted);
+  font-size: 12px;
+  border-top: 1px solid var(--line);
+}
+
+@media (max-width: 480px) {
+  .toc-grid { grid-template-columns: 1fr 1fr; gap: 8px; }
+  .toc-card { padding: 14px 12px 12px; }
+  .toc-card-title { font-size: 13px; }
+}
+</style>
+</head>
+<body>
+
+<header>
+  <a class="header-back" href="index.html">← Study Hub</a>
+  <h1>청소년활동론</h1>
+  <div class="header-sub">한국방송통신대학교 · 청소년교육복지상담학과</div>
+</header>
+
+<!-- 목차 페이지 -->
+<div class="toc-wrap" id="tocWrap">
+  <div class="toc-title">목차</div>
+  <div class="toc-grid" id="tocGrid"></div>
+</div>
+
+<!-- 문제 페이지 -->
+<div class="quiz-wrap" id="quizWrap">
+  <div class="quiz-header">
+    <button class="quiz-back" onclick="showToc()">← 목차로</button>
+    <div class="quiz-ch-title" id="quizChTitle"></div>
+  </div>
+  <div id="quizContent"></div>
+</div>
+
+<footer>한국방송통신대학교 · 청소년교육복지상담학과</footer>
+
+<script>
+// ── 목차 데이터 ──
+const chapters = [{"id": "ch1", "num": "제1장", "label": "제1장 청소년활동의 개념적 이해"}, {"id": "ch2", "num": "제2장", "label": "제2장 청소년개발 실천전략으로서의 청소년활동"}, {"id": "ch3", "num": "제3장", "label": "제3장 청소년활동의 영역 및 유형"}, {"id": "ch4", "num": "제4장", "label": "제4장 청소년활동의 이론적 토대"}, {"id": "ch5", "num": "제5장", "label": "제5장 청소년활동의 교육적 가치"}, {"id": "ch6", "num": "제6장", "label": "제6장 청소년활동의 발전과정"}, {"id": "ch7", "num": "제7장", "label": "제7장 청소년활동 프로그램"}, {"id": "ch8", "num": "제8장", "label": "제8장 청소년활동의 장"}, {"id": "ch9", "num": "제9장", "label": "제9장 청소년활동지도자"}, {"id": "ch10", "num": "제10장", "label": "제10장 청소년활동의 법적·제도적 기반"}, {"id": "ch11", "num": "제11장", "label": "제11장 청소년활동의 실제"}, {"id": "ch12", "num": "제12장", "label": "제12장 청소년활동과 지역사회"}, {"id": "ch13", "num": "제13장", "label": "제13장 외국의 청소년활동"}, {"id": "ch14", "num": "제14장", "label": "제14장 청소년활동의 현황과 과제"}];
+
+// ── 기출문제 데이터 ──
+// 형식: { ch: 'ch1', text: '문제 내용', ans: '①', exp: '해설' }
+const quizData = [];
+
+// ── 목차 렌더링 ──
+const tocGrid = document.getElementById('tocGrid');
+chapters.forEach(ch => {
+  const count = quizData.filter(q => q.ch === ch.id).length;
+  const card = document.createElement('button');
+  card.className = 'toc-card';
+  card.innerHTML = `
+    <div class="toc-card-num">${ch.num}</div>
+    <div class="toc-card-title">${ch.label}</div>
+    <div class="toc-card-count">${count > 0 ? count + '문항' : '준비 중'}</div>
+  `;
+  card.addEventListener('click', () => showQuiz(ch));
+  tocGrid.appendChild(card);
+});
+
+// ── 목차 ↔ 문제 전환 ──
+function showToc() {
+  document.getElementById('tocWrap').style.display = 'block';
+  document.getElementById('quizWrap').style.display = 'none';
+  window.scrollTo(0, 0);
+}
+
+function showQuiz(ch) {
+  document.getElementById('tocWrap').style.display = 'none';
+  document.getElementById('quizWrap').style.display = 'block';
+  document.getElementById('quizChTitle').textContent = ch.label;
+  renderQuiz(ch.id);
+  window.scrollTo(0, 0);
+}
+
+function renderQuiz(chId) {
+  const wrap = document.getElementById('quizContent');
+  wrap.innerHTML = '';
+  const items = quizData.filter(q => q.ch === chId);
+
+  if (items.length === 0) {
+    wrap.innerHTML = '<p class="placeholder-note">기출문제를 추가해주세요.</p>';
+    return;
+  }
+
+  items.forEach((q, i) => {
+    const card = document.createElement('article');
+    card.className = 'qcard';
+
+    const num = document.createElement('div');
+    num.className = 'q-num';
+    num.textContent = `문제 ${i + 1}`;
+    card.appendChild(num);
+
+    const body = document.createElement('pre');
+    body.className = 'q-body';
+    body.textContent = q.text;
+    card.appendChild(body);
+
+    if (q.ans) {
+      const btn = document.createElement('button');
+      btn.className = 'answer-btn';
+      btn.innerHTML = '▶ 정답 및 해설 보기';
+      card.appendChild(btn);
+
+      const box = document.createElement('div');
+      box.className = 'answer-box';
+      box.innerHTML = `<div class="ans-label">정답: ${q.ans}</div><div>${q.exp}</div>`;
+      card.appendChild(box);
+
+      btn.addEventListener('click', () => {
+        const open = box.classList.contains('visible');
+        box.classList.toggle('visible', !open);
+        btn.classList.toggle('open', !open);
+        btn.innerHTML = open ? '▶ 정답 및 해설 보기' : '▼ 정답 및 해설 닫기';
+      });
+    }
+
+    wrap.appendChild(card);
+  });
+}
+</script>
+</body>
+</html>
