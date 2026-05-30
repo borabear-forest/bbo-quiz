@@ -17,6 +17,14 @@
   --soft: #eaeff6;
   --radius: 14px;
   --shadow: 0 2px 16px rgba(28,26,23,.07);
+  --correct: #2d6a4f;
+  --correct-bg: #e8f5ee;
+  --correct-line: #95d5b2;
+  --wrong: #9b2335;
+  --wrong-bg: #fdf0f0;
+  --wrong-line: #e8a0a8;
+  --exp-bg: #f0f4fa;
+  --exp-line: #a8bed8;
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -62,16 +70,11 @@ header h1 {
   font-family: 'Noto Serif KR', serif;
   font-size: 18px;
   font-weight: 700;
-  color: var(--ink);
   margin-bottom: 16px;
   padding-bottom: 12px;
   border-bottom: 2px solid var(--ink);
 }
-.toc-list {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
+.toc-list { display: flex; flex-direction: column; gap: 8px; }
 .toc-item {
   background: var(--paper);
   border: 1px solid var(--line);
@@ -81,22 +84,15 @@ header h1 {
   align-items: center;
   gap: 16px;
   box-shadow: var(--shadow);
-  cursor: default;
 }
 .toc-num {
   font-size: 13px;
   font-weight: 900;
   color: var(--muted);
-  letter-spacing: .04em;
   min-width: 24px;
 }
-.toc-label {
-  flex: 1;
-  font-size: 15px;
-  font-weight: 700;
-  color: var(--ink);
-  word-break: keep-all;
-}
+.toc-label { flex: 1; font-size: 15px; font-weight: 700; word-break: keep-all; }
+.toc-meta { font-size: 11px; color: var(--muted); white-space: nowrap; }
 .toc-btn {
   flex-shrink: 0;
   background: none;
@@ -110,28 +106,22 @@ header h1 {
   cursor: pointer;
   transition: all .15s;
   white-space: nowrap;
-  touch-action: manipulation;
 }
 .toc-btn:hover { background: var(--accent); color: #fff; }
-.toc-btn.wip {
-  border-color: var(--line);
-  color: var(--muted);
-  cursor: default;
-  pointer-events: none;
-}
+.toc-btn.wip { border-color: var(--line); color: var(--muted); pointer-events: none; }
 
 /* ── 문제 페이지 ── */
 .quiz-wrap {
   max-width: 720px;
   margin: 0 auto;
-  padding: 32px 16px 80px;
+  padding: 28px 16px 80px;
   display: none;
 }
 .quiz-header {
   display: flex;
   align-items: center;
   gap: 12px;
-  margin-bottom: 24px;
+  margin-bottom: 20px;
   padding-bottom: 14px;
   border-bottom: 2px solid var(--ink);
 }
@@ -146,7 +136,6 @@ header h1 {
   color: var(--muted);
   cursor: pointer;
   transition: all .15s;
-  white-space: nowrap;
 }
 .quiz-back:hover { border-color: var(--accent); color: var(--accent); }
 .quiz-ch-title {
@@ -157,12 +146,13 @@ header h1 {
   word-break: keep-all;
 }
 
+/* ── 문제 카드 ── */
 .qcard {
   background: var(--paper);
   border: 1px solid var(--line);
   border-radius: var(--radius);
-  padding: 20px 22px;
-  margin-bottom: 12px;
+  padding: 20px 20px 16px;
+  margin-bottom: 14px;
   box-shadow: var(--shadow);
 }
 .q-num {
@@ -172,55 +162,109 @@ header h1 {
   letter-spacing: .08em;
   margin-bottom: 8px;
 }
-.q-body {
+.q-text {
   font-size: 15px;
   line-height: 1.75;
   white-space: pre-wrap;
-  font-family: 'Noto Sans KR', sans-serif;
   word-break: keep-all;
-  overflow-wrap: break-word;
+  margin-bottom: 14px;
 }
-.answer-btn {
-  margin-top: 14px;
+
+/* ── 선택지 버튼 ── */
+.options { display: flex; flex-direction: column; gap: 7px; }
+.opt-btn {
+  width: 100%;
+  text-align: left;
+  background: var(--bg);
+  border: 1.5px solid var(--line);
+  border-radius: 10px;
+  padding: 10px 14px;
+  font-size: 14px;
+  font-family: 'Noto Sans KR', sans-serif;
+  line-height: 1.6;
+  cursor: pointer;
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  transition: border-color .15s, background .15s;
+  word-break: keep-all;
+}
+.opt-btn:hover:not(:disabled) { border-color: var(--accent); background: var(--soft); }
+.opt-btn:disabled { cursor: default; }
+
+.opt-mark {
+  font-weight: 900;
+  color: var(--muted);
+  min-width: 20px;
+  font-size: 14px;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+/* 정답 */
+.opt-btn.correct {
+  background: var(--correct-bg);
+  border-color: var(--correct-line);
+  color: var(--correct);
+}
+.opt-btn.correct .opt-mark { color: var(--correct); }
+
+/* 오답 */
+.opt-btn.wrong {
+  background: var(--wrong-bg);
+  border-color: var(--wrong-line);
+  color: var(--wrong);
+}
+.opt-btn.wrong .opt-mark { color: var(--wrong); }
+
+/* 정답 강조 (선택 안 했을 때) */
+.opt-btn.reveal {
+  background: var(--correct-bg);
+  border-color: var(--correct-line);
+  color: var(--correct);
+}
+.opt-btn.reveal .opt-mark { color: var(--correct); }
+
+/* ── 해설 박스 ── */
+.exp-box {
+  display: none;
+  margin-top: 12px;
+  padding: 12px 14px;
+  background: var(--exp-bg);
+  border-left: 3px solid var(--accent);
+  border-radius: 0 10px 10px 0;
+  font-size: 13.5px;
+  line-height: 1.75;
+  color: var(--ink);
+  word-break: keep-all;
+}
+.exp-box.visible { display: block; }
+.exp-label {
+  font-size: 11px;
+  font-weight: 900;
+  color: var(--accent);
+  letter-spacing: .06em;
+  margin-bottom: 4px;
+}
+
+/* 다시풀기 버튼 */
+.reset-btn {
+  margin-top: 10px;
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  padding: 7px 15px;
+  gap: 5px;
+  padding: 6px 13px;
   border-radius: 999px;
-  border: 1.5px solid var(--accent);
+  border: 1.5px solid var(--line);
   background: transparent;
-  color: var(--accent);
-  font-size: 13px;
+  color: var(--muted);
+  font-size: 12px;
   font-weight: 700;
   font-family: inherit;
   cursor: pointer;
   transition: all .15s;
-  touch-action: manipulation;
 }
-.answer-btn:hover { background: var(--soft); }
-.answer-btn.open { background: var(--accent); color: #fff; }
-.answer-box {
-  display: none;
-  margin-top: 12px;
-  padding: 14px 16px;
-  background: var(--soft);
-  border-radius: 12px;
-  border: 1px solid #a8bed8;
-  font-size: 14px;
-  line-height: 1.75;
-  white-space: pre-wrap;
-  word-break: keep-all;
-  overflow-wrap: break-word;
-}
-.answer-box.visible { display: block; }
-.ans-label { font-weight: 900; color: var(--accent); font-size: 14px; margin-bottom: 6px; }
-.placeholder-note {
-  color: var(--muted);
-  font-size: 14px;
-  font-style: italic;
-  padding: 40px 0;
-  text-align: center;
-}
+.reset-btn:hover { border-color: var(--accent); color: var(--accent); }
 
 footer {
   text-align: center;
@@ -231,8 +275,9 @@ footer {
 }
 
 @media (max-width: 480px) {
-  .toc-label { font-size: 14px; }
   .toc-item { padding: 13px 14px; gap: 10px; }
+  .toc-label { font-size: 14px; }
+  .opt-btn { font-size: 13px; padding: 9px 12px; }
 }
 </style>
 </head>
@@ -259,23 +304,23 @@ footer {
 <footer>청소년교육복지상담학과</footer>
 
 <script>
-const chapters = [{"id": "ch1", "label": "리더십의 의미"}, {"id": "ch2", "label": "청소년과 리더십"}, {"id": "ch3", "label": "리더십 특성이론"}, {"id": "ch4", "label": "리더십 행동이론"}, {"id": "ch5", "label": "리더십 상황이론"}, {"id": "ch6", "label": "현대 리더십 이슈"}, {"id": "ch7", "label": "자기인식"}, {"id": "ch8", "label": "스트레스 관리와 회복탄력성"}, {"id": "ch9", "label": "분석적 문제해결"}, {"id": "ch10", "label": "창의적 문제해결"}, {"id": "ch11", "label": "커뮤니케이션"}, {"id": "ch12", "label": "동기유발"}, {"id": "ch13", "label": "팀 빌딩"}, {"id": "ch14", "label": "갈등관리"}, {"id": "ch15", "label": "청소년 리더십 개발전략"}];
-const quizData = [];
+const MARKS = ['①','②','③','④','⑤'];
 
+const chapters = [{"id": "ch1", "label": "제1장 리더십의 의미"}, {"id": "ch2", "label": "제2장 청소년과 리더십"}, {"id": "ch3", "label": "제3장 리더십 특성이론"}, {"id": "ch4", "label": "제4장 리더십 행동이론"}, {"id": "ch5", "label": "제5장 리더십 상황이론"}, {"id": "ch6", "label": "제6장 현대 리더십 이슈"}, {"id": "ch7", "label": "제7장 자기인식"}, {"id": "ch8", "label": "제8장 스트레스 관리와 회복탄력성"}, {"id": "ch9", "label": "제9장 분석적 문제해결"}, {"id": "ch10", "label": "제10장 창의적 문제해결"}, {"id": "ch11", "label": "제11장 커뮤니케이션"}, {"id": "ch12", "label": "제12장 동기유발"}, {"id": "ch13", "label": "제13장 팀 빌딩"}, {"id": "ch14", "label": "제14장 갈등관리"}, {"id": "ch15", "label": "제15장 청소년 리더십 개발전략"}];
+const quizData = [{"ch": "ch1", "text": "다음 중 리더십에 대한 설명으로 가장 적절하지 않은 것은?", "options": ["리더십의 어원은 앵글로색슨의 고대어 '레단(ledan)'에서 유래되었다.", "리더십은 다른 사람의 사고, 감정, 행동에 의미심장한 영향을 미치는 능력을 말한다.", "합법적 권력을 가진 사람만이 리더십을 가질 수 있다.", "지구상 가장 많이 관찰되었지만, 가장 덜 밝혀진 현상 중 하나이다."], "ans": 2, "exp": "리더십은 합법적 권력 여부와 관계없이 누구나 가질 수 있다. 공식적 지위나 권력과 반드시 연결되지 않는다."}, {"ch": "ch1", "text": "다음 보기와 관련된 권력의 원천은 무엇인가?\n\n\"A님은 누구보다 알기 쉽게 일을 설명했으며, 유사한 일을 할 때도 적용할 수 있는 원칙들을 알려주셨어.\"", "options": ["합법적 권력(legitimate power)", "보상 권력(reward power)", "강제 권력(coercive power)", "전문성 권력(expert power)"], "ans": 3, "exp": "지식과 기술을 전달하고 원칙을 가르쳐주는 것은 전문적 지식·능력에서 비롯된 전문성 권력(expert power)이다."}, {"ch": "ch1", "text": "다음 중 리더십의 근원적 상태와 관련 없는 것은?", "options": ["본능적으로 안전을 지향함", "주체적으로 행동할 수 있음", "타인에게 관심을 기울임", "외부에 개방적인 태도를 가짐"], "ans": 0, "exp": "\"본능적으로 안전을 지향함\"은 리더십의 근원적 상태가 아니라 오히려 그것을 방해하는 요소에 해당한다."}, {"ch": "ch2", "text": "다음 중 청소년기 리더십 개발에 대한 설명으로 적절하지 않은 것은?", "options": ["리더십 기술은 청소년기에 두드러지게 발달한다.", "모든 청소년들이 리더십에 대해 배울 수 있으며, 리더로서의 잠재력을 가지고 있다.", "리더로서의 행동뿐만 아니라 리더가 되는 과정과 리더가 되는 것도 개발되어야 한다.", "다양한 상황에서도 하나의 리더십 행동만 있으면 된다."], "ans": 3, "exp": "효과적인 리더십은 상황에 따라 다양한 행동과 접근이 필요하다. 하나의 리더십 행동만으로는 다양한 상황에 대응할 수 없다."}, {"ch": "ch2", "text": "리더십 개발에 영향을 미치는 청소년의 발달적 특성 중 '이상주의'에 대한 설명으로 적절한 것은?", "options": ["적극적인 상상력과 이상을 꿈꾸는 것은 낭비적인 활동이 아니다.", "직·간접적인 행동으로 이어지는 것은 아니다.", "일반적으로 후기 청소년기까지 지속되다가 점차 강해진다.", "부모로부터 분리된 정체성을 찾기 시작하며, 더 넓은 사회적 관점에서 변화를 만들려고 한다."], "ans": 0, "exp": "청소년기 이상주의는 낭비가 아니라 리더십 개발의 중요한 토대이다. ②행동으로 이어질 수 있고, ③후기에 점차 약해지며, ④는 독립추구에 대한 설명이다."}, {"ch": "ch2", "text": "Leis와 Reinecke(2020)가 제시한 리더십 차원이 아닌 것은?", "options": ["자기 이끌기", "다른 사람과 함께 이끌기", "세상 변화시키기", "스트레스 관리하기"], "ans": 3, "exp": "Leis와 Reinecke(2020)의 리더십 차원은 자기 이끌기, 다른 사람과 함께 이끌기, 세상 변화시키기의 3가지이다."}, {"ch": "ch3", "text": "리더십 특성 이론과 관련된 진술 중 적절하지 않은 것은?", "options": ["리더는 태어나는 것이지 만들어지는 것이 아니다.", "위인 이론(great man theory)과 관련 있다.", "리더가 태어나는 것이라는 주장을 정당화할 만한 근거는 많지 않다.", "리더십 특성을 분석하면, 리더십 성과를 충분히 예측할 수 있다."], "ans": 3, "exp": "특성만으로 리더십 성과를 충분히 예측하기 어렵다는 것이 특성 이론의 주요 한계이다. 상황·맥락·행동 등 다양한 요소가 함께 작용한다."}, {"ch": "ch3", "text": "시간 강박, 경쟁성, 다면적 행동, 적대성의 특성에 해당하는 리더십 특성은?", "options": ["통제 위치", "타입 A 성격", "리더십의 근원적 상태", "마키아벨리적 성격"], "ans": 1, "exp": "시간 강박, 경쟁성, 다면적 행동(여러 일 동시 처리), 적대성은 타입 A 성격(Type A Personality)의 핵심 특성이다."}, {"ch": "ch3", "text": "리더십 성격 특성의 활용에 대한 진술로 적절한 것은?", "options": ["성격적 특성들은 일반적으로 서로 간의 관련성이 크다.", "성격적 특성이 극단적으로 치우치면 리더십을 발휘하는데 도움이 된다.", "성격적 특성 도구는 자기인식 및 자기개발에 활용될 수 있다.", "리더십 성격 특성을 청소년의 진로의사결정에 적극적으로 사용해야 한다."], "ans": 2, "exp": "성격 특성 도구(MBTI, Big 5 등)는 자기 자신을 이해하고 자기개발 방향을 설정하는 데 유용하게 활용된다."}, {"ch": "ch4", "text": "민주형과 권위형으로 분류하고 집단 성과와 만족도를 비교 분석한 초기 리더십 행동 연구는?", "options": ["오하이오 주립대학 연구", "미시간 대학 연구", "브레이크와 머튼의 관리격차 이론", "레빈(Lewin) 등의 아이오와 대학 연구"], "ans": 3, "exp": "레빈(Lewin) 등의 아이오와 대학 연구는 민주형·권위형·방임형으로 분류하여 집단 성과와 만족도를 비교 분석한 초기 연구이다."}, {"ch": "ch4", "text": "오하이오 주립대학의 리더십 연구에서 제시한 두 가지 핵심 행동 차원은?", "options": ["구조주도(initiating structure) - 배려(consideration)", "생산중심(production-centered) - 종업원중심(employee-centered)", "관계지향(relationship-oriented) - 과업지향(task-oriented)", "혁신지향(innovation-oriented) - 유지지향(maintenance-oriented)"], "ans": 0, "exp": "오하이오 주립대학 연구는 구조주도(과업 구조화)와 배려(구성원 관계)의 두 차원을 제시하였다. ②는 미시간 대학 연구의 차원이다."}, {"ch": "ch4", "text": "블레이크와 머튼의 관리격차 이론에서 생산과 인간에 대한 관심이 모두 높은 이상적 리더 유형(9,9형)은?", "options": ["인기형(Country Club Management)", "과업형(Authority-Compliance Management)", "팀형(Team Management)", "타협형(Middle-of-the-Road Management)"], "ans": 2, "exp": "9,9형은 팀형(Team Management)이다. 인기형은 인간 중심(1,9), 과업형은 생산 중심(9,1), 타협형은 중간형(5,5)이다."}, {"ch": "ch5", "text": "피들러(Fiedler)의 상황적합 이론에서 리더의 성향을 측정하는 핵심 도구는?", "options": ["권력 거리 척도", "LPC(Least Preferred Coworker) 척도", "구조주도 척도", "통제 위치 척도"], "ans": 1, "exp": "LPC 척도는 리더가 가장 함께 일하기 싫어하는 동료를 평가하게 함으로써 리더의 과업지향성 또는 관계지향성을 측정한다."}, {"ch": "ch5", "text": "허시와 블랜차드의 상황적 리더십 이론에서 리더십 유형을 결정하는 가장 중요한 상황 변수는?", "options": ["구성원의 성숙도(역량과 의지)", "직위 권력의 크기", "과업 구조의 명확성", "조직의 문화와 환경"], "ans": 0, "exp": "허시와 블랜차드의 핵심 상황 변수는 구성원의 성숙도로, 역량(능력)과 의지(동기)의 조합에 따라 리더십 유형을 달리해야 한다."}, {"ch": "ch5", "text": "구성원의 능력은 낮으나 동기가 높은 발달 단계에 가장 적합한 리더십 행동 유형은?", "options": ["지시형(Directing)", "지도형/코칭형(Coaching)", "지원형(Supporting)", "위임형(Delegating)"], "ans": 0, "exp": "능력은 낮지만 의지가 높은 D1 단계에는 구체적인 지시와 방향 제시가 필요한 지시형(Directing)이 가장 적합하다."}, {"ch": "ch6", "text": "부하직원의 고차원적 욕구를 자극하여 가치관과 태도의 변화를 이끌어내는 리더십은?", "options": ["거래적 리더십", "변혁적 리더십", "합법적 리더십", "서번트 리더십"], "ans": 1, "exp": "변혁적 리더십은 구성원의 고차원 욕구를 자극하고 가치관과 태도 변화를 통해 조직 변혁을 추구한다."}, {"ch": "ch6", "text": "변혁적 리더십의 4가지 핵심 요인(4Is)에 해당하지 않는 것은?", "options": ["카리스마/이상적인 영향력(Idealized Influence)", "영감적 동기유발(Inspirational Motivation)", "지적 자극(Intellectual Stimulation)", "예외적 관리(Management by Exception)"], "ans": 3, "exp": "변혁적 리더십의 4Is는 이상적 영향력·영감적 동기유발·지적 자극·개별적 배려이다. 예외적 관리는 거래적 리더십의 구성요소이다."}, {"ch": "ch6", "text": "자신의 가치관·신념·감정을 투명하게 하고 행동과 일치시키며 진실한 관계를 형성하는 리더십은?", "options": ["카리스마적 리더십", "진정성 리더십(Authentic Leadership)", "감성 리더십", "거래적 리더십"], "ans": 1, "exp": "진정성 리더십은 자기인식, 균형 잡힌 정보처리, 내면화된 도덕관, 관계적 투명성의 4가지 핵심 요소로 구성된다."}, {"ch": "ch7", "text": "자기인식(Self-awareness)에 대한 설명으로 가장 적절하지 않은 것은?", "options": ["자신의 성격, 가치관, 능력, 감정 등을 명확히 이해하는 과정이다.", "내부적·외부적 자기인식을 모두 포함한다.", "자기인식이 높은 리더는 자신의 위선이나 한계를 숨기는 데 능숙하다.", "리더십 개발의 가장 첫 번째 단계이자 핵심적인 토대이다."], "ans": 2, "exp": "자기인식이 높은 리더는 한계와 위선을 숨기는 것이 아니라 오히려 솔직하게 인정하고 투명하게 드러낸다."}, {"ch": "ch7", "text": "개인이 정보를 처리하고 문제를 해결하는 선호적인 방식을 의미하는 자기인식의 차원은?", "options": ["개인 가치", "인지 스타일(Cognitive style)", "감성 지능", "변화 지향성"], "ans": 1, "exp": "인지 스타일(Cognitive style)은 개인이 정보를 수집하고 처리하며 문제를 해결하는 방식의 선호 패턴이다."}, {"ch": "ch7", "text": "자기인식 향상 과정에서 심리적 저항을 극복하기 위한 방법으로 적절한 것은?", "options": ["비판적 피드백 신호를 무시한다.", "Comfort zone(안전지대)을 견고하게 유지한다.", "신뢰할 수 있는 동료나 지도자로부터 객관적인 피드백을 구하고 성찰한다.", "가치관과 행동의 불일치를 합리화한다."], "ans": 2, "exp": "신뢰할 수 있는 타인으로부터 솔직한 피드백을 구하고 성찰하는 것이 자기인식 향상의 가장 효과적인 방법이다."}, {"ch": "ch8", "text": "유해한 스트레스(Distress)와 구별되며, 적당한 긴장감으로 생산성과 동기를 향상시키는 유익한 스트레스는?", "options": ["만성 스트레스", "예상 스트레스", "유스트레스(Eustress)", "대면 스트레스"], "ans": 2, "exp": "유스트레스(Eustress)는 한스 셀리에(Hans Selye)가 제시한 긍정적이고 유익한 스트레스로, 동기와 수행 능력을 향상시킨다."}, {"ch": "ch8", "text": "회복탄력성의 핵심 구성 영역 중 역경 상황에서 자신의 감정을 조절하고 충동을 통제하는 능력은?", "options": ["자기조절 능력", "대인관계 능력", "긍정성", "인지적 유연성"], "ans": 0, "exp": "자기조절 능력은 회복탄력성의 핵심 요소로, 역경 상황에서 감정 조절과 충동 통제 능력을 포함한다."}, {"ch": "ch8", "text": "중요도와 시급성을 기준으로 가장 먼저 처리해야 할 과업의 영역은?", "options": ["중요하지만 시급하지 않은 일", "중요하고 시급한 일", "중요하지 않으나 시급한 일", "중요하지도 시급하지도 않은 일"], "ans": 1, "exp": "아이젠하워 매트릭스에서 중요하고 시급한 일은 즉시 처리해야 할 최우선 과업이다."}, {"ch": "ch9", "text": "분석적 문제해결의 4단계 과정을 순서대로 올바르게 나열한 것은?", "options": ["대안모색 → 문제정의 → 대안평가 및 선택 → 해결책 실행", "문제정의 → 대안모색 → 대안평가 및 선택 → 해결책 실행 및 추후 점검", "문제정의 → 대안평가 → 대안선택 → 해결책 실행", "대안모색 → 대안평가 → 문제정의 → 해결책 실행"], "ans": 1, "exp": "분석적 문제해결의 4단계: 문제정의 → 대안모색 → 대안평가 및 선택 → 해결책 실행 및 추후 점검."}, {"ch": "ch9", "text": "문제정의 단계에서 눈에 보이는 현상이나 징후만을 문제로 파악하는 오류는?", "options": ["증상과 원인의 혼동", "대안평가의 조급성", "정보의 과부하", "자발적 실패 거부"], "ans": 0, "exp": "증상과 원인의 혼동은 표면에 나타나는 현상(증상)을 문제 자체로 착각하여 진짜 원인을 놓치는 오류이다."}, {"ch": "ch9", "text": "시제품을 빠르게 만들어 자발적 실패를 통해 학습하는 Rapid prototyping의 장점은?", "options": ["실패 비용을 극대화한다.", "완벽한 대안이 나올 때까지 실행을 미루게 한다.", "불확실성을 빠르게 감소시키고 실질적인 해결책으로 수정 보완을 가능하게 한다.", "집단적 사고의 오류를 심화시킨다."], "ans": 2, "exp": "Rapid prototyping은 불확실성을 빠르게 감소시키고 실질적 수정이 가능하다는 장점이 있다."}, {"ch": "ch10", "text": "과거의 성공 방식에 지나치게 몰입하여 새로운 대안을 보지 못하는 개념적 장벽은?", "options": ["일관성(Constancy)", "몰입(Commitment)", "압축(Compression)", "안주(Complacency)"], "ans": 1, "exp": "몰입(Commitment)은 과거의 성공 경험이나 특정 프레임에 집착하여 새로운 대안을 차단하는 개념적 장벽이다."}, {"ch": "ch10", "text": "창의적 사고 4단계(Wallas, 1926) 중 의식적 노력을 멈추고 무의식 속에서 아이디어가 성숙되는 단계는?", "options": ["준비 단계(Preparation)", "배양 단계(Incubation)", "조명 단계(Illumination)", "검증 단계(Verification)"], "ans": 1, "exp": "배양(Incubation) 단계는 의식적 노력을 멈추고 무의식에서 아이디어가 익어가는 단계이다."}, {"ch": "ch10", "text": "문제 정의를 확장하고 향상시키기 위한 방법으로 적절하지 않은 것은?", "options": ["문제를 다른 말로 다르게 표현해 본다.", "'왜?'라는 질문을 반복하여 근본적인 목적을 찾는다.", "처음 생각한 문제 정의를 고수하고 신속하게 결론을 내린다.", "복잡한 문제를 더 작고 다루기 쉬운 부분으로 쪼개어 본다."], "ans": 2, "exp": "처음 생각한 문제 정의를 고수하고 신속하게 결론 내리는 것은 창의적 문제해결을 방해한다."}, {"ch": "ch11", "text": "대인관계를 손상시키지 않으면서 부정적인 피드백을 전달하도록 돕는 커뮤니케이션 원칙은?", "options": ["전략적 커뮤니케이션", "지원적 커뮤니케이션(Supportive communication)", "설득적 커뮤니케이션", "비언어적 커뮤니케이션"], "ans": 1, "exp": "지원적 커뮤니케이션은 관계를 손상시키지 않으면서 부정적 피드백을 전달하는 것을 목표로 한다."}, {"ch": "ch11", "text": "상대방의 인격보다 구체적인 행동이나 사건에 초점을 맞추어 말하는 지원적 커뮤니케이션 원칙은?", "options": ["일치하는 커뮤니케이션", "기술적인(Descriptive) 커뮤니케이션", "문제 중심의 커뮤니케이션", "개인을 인정하는 커뮤니케이션"], "ans": 1, "exp": "기술적인 커뮤니케이션은 \"너는 왜 이렇게 게으르니(평가)\" 대신 \"어제 보고서 제출이 늦었어(행동 기술)\"처럼 구체적 행동에 초점을 맞춘다."}, {"ch": "ch11", "text": "상대방이 전달한 메시지의 본질과 감정을 거울처럼 다시 비추어 주는 경청 방식은?", "options": ["반사적 경청(Reflective listening)", "자문적 경청", "편파적 경청", "수동적 경청"], "ans": 0, "exp": "반사적 경청(Reflective listening)은 상대방의 말과 감정을 거울처럼 반영해 주는 방식으로, 공감적 이해와 수용을 전달한다."}, {"ch": "ch12", "text": "매슬로우의 욕구위계론에서 리더십의 근원적 상태와 가장 밀접하게 연결되는 최고차원의 욕구는?", "options": ["생리적 욕구", "존경의 욕구", "사회적 욕구", "자기실현의 욕구"], "ans": 3, "exp": "자기실현의 욕구는 자신의 잠재력을 최대한 발휘하고자 하는 욕구로, 리더십의 근원적 상태와 가장 밀접하게 연결된다."}, {"ch": "ch12", "text": "브룸(Vroom)의 기대이론에서 동기유발을 결정하는 3가지 핵심 요인은?", "options": ["기대감(Expectancy) - 수단성(Instrumentality) - 유의성(Valence)", "성취구동 - 권력구동 - 친교구동", "존재욕구 - 관계욕구 - 성장욕구", "위생요인 - 동기요인"], "ans": 0, "exp": "브룸의 기대이론: 동기(M) = 기대감(E) × 수단성(I) × 유의성(V). 기대감은 노력→성과, 수단성은 성과→보상, 유의성은 보상의 매력도이다."}, {"ch": "ch12", "text": "로크(Locke)의 목표설정이론에서 동기를 가장 강하게 유발하는 목표의 특성은?", "options": ["\"최선을 다하라\"와 같은 모호한 목표", "실현 가능성이 전혀 없는 터무니없는 목표", "구체적이고 적절한 난이도가 있는 도전적 목표", "난이도가 매우 낮아 쉽게 달성할 수 있는 목표"], "ans": 2, "exp": "구체적(Specific)이고 적절히 도전적인(Challenging) 목표가 동기를 가장 강하게 유발한다. SMART 목표 설정의 이론적 근거이다."}, {"ch": "ch13", "text": "터크맨의 팀 발달 단계 중 규칙이나 역할 분담 과정에서 갈등과 대립이 표출되는 단계는?", "options": ["형성(Forming) 단계", "혼란(Storming) 단계", "규범(Norming) 단계", "수행(Performing) 단계"], "ans": 1, "exp": "터크맨의 팀 발달 5단계: 형성→혼란→규범→수행→해체. 혼란(Storming) 단계에서 갈등과 대립이 표출된다."}, {"ch": "ch13", "text": "팀의 규범(Norming) 단계에서 리더가 집중해야 할 역할로 가장 적절한 것은?", "options": ["구성원들 간의 갈등을 중재하고 신뢰 문화를 형성한다.", "팀의 목적과 방향성을 명확히 제시하고 소개한다.", "리더십 권한을 완전히 위임하여 독자적으로 일하게 한다.", "팀의 생산성 극대화를 위해 과업 통제만을 강화한다."], "ans": 0, "exp": "규범(Norming) 단계에서 리더는 갈등을 중재하고 신뢰 문화를 형성하는 역할에 집중해야 한다."}, {"ch": "ch13", "text": "개인이 집단에 참여할 때 혼자 일할 때보다 노력을 덜 기울여 성과가 떨어지는 현상은?", "options": ["집단 사고", "사회적 태만(Social loafing)", "기러기 효과", "시너지 효과"], "ans": 1, "exp": "사회적 태만(Social loafing, 링겔만 효과)은 집단에서 개인의 기여가 드러나지 않을 때 노력을 덜 기울이는 현상이다."}, {"ch": "ch14", "text": "독단성은 낮고 협조성은 높은 갈등 대처 방식은?", "options": ["회피형(Avoiding)", "수용형/양보형(Accommodating)", "경쟁형(Competing)", "타협형(Compromising)"], "ans": 1, "exp": "수용형(Accommodating)은 독단성 낮음 + 협조성 높음의 조합으로, 상대방의 요구를 우선시하고 자신의 이익을 양보한다."}, {"ch": "ch14", "text": "가용 자원의 한계나 조직 구조적 문제, 역할의 모호성으로 인해 발생하는 갈등 유형은?", "options": ["가치관 갈등", "관계 갈등", "구조적 원인에 의한 갈등", "성격 갈등"], "ans": 2, "exp": "구조적 원인에 의한 갈등은 자원 부족, 조직 구조의 문제, 역할 모호성 등 환경적·구조적 요인에서 비롯된다."}, {"ch": "ch14", "text": "협력형(Collaborating) 갈등 해결 방식의 궁극적인 목표는?", "options": ["양측의 이익을 적당히 절반씩 양보하여 봉합한다.", "나의 논리로 상대를 설득하여 승리한다.", "양측의 근본적인 욕구를 모두 충족시키는 윈-윈(Win-Win) 해결책을 찾는다.", "갈등 상황을 회피하여 자연스럽게 소멸되도록 기다린다."], "ans": 2, "exp": "협력형(Collaborating)은 독단성 높음 + 협조성 높음의 조합으로, 양측의 근본적 욕구를 모두 충족시키는 Win-Win 해결책을 추구한다."}, {"ch": "ch15", "text": "실제 상황과 유사한 가상 환경에서 의사결정과 문제해결을 체험하게 하는 프로그램은?", "options": ["토론 프로그램", "시뮬레이션 프로그램", "가치 경매 프로그램", "라운드 로빈"], "ans": 1, "exp": "시뮬레이션 프로그램은 실제와 유사한 가상 환경에서 직접 의사결정과 문제해결을 경험하게 하는 체험 학습의 대표적 형태이다."}, {"ch": "ch15", "text": "청소년이 스스로 주도성을 갖고 성장할 수 있도록 돕는 지도자 원칙은?", "options": ["지도자가 모든 것을 결정하고 지시한다.", "청소년이 할 수 있는 것은 청소년이 해야 한다.", "실패할 가능성이 있는 활동은 원천 차단한다.", "완벽한 결과물만을 요구한다."], "ans": 1, "exp": "청소년이 스스로 할 수 있는 것은 직접 하게 하는 것이 자기주도성과 역량 개발을 위한 핵심 원칙이다."}, {"ch": "ch15", "text": "청소년 지도자가 청소년과의 관계에서 건강한 심리적 거리를 유지하기 위해 설정해야 하는 원칙은?", "options": ["기대치 설정", "한계 및 경계 설정", "본보기 보이기", "무조건적 수용"], "ans": 1, "exp": "한계 및 경계 설정(Limit & Boundary setting)은 과도한 친밀감이나 의존을 방지하고 전문적 관계를 유지하기 위한 원칙이다."}];
+
+// ── 목차 렌더링 ──
 const tocList = document.getElementById('tocList');
 chapters.forEach((ch, i) => {
-  const count = quizData.filter(q => q.ch === ch.id).length;
-  const item = document.createElement('div');
-  item.className = 'toc-item';
-
-  const num = document.createElement('span');
-  num.className = 'toc-num';
-  num.textContent = String(i + 1).padStart(2, '0');
-
-  const label = document.createElement('span');
-  label.className = 'toc-label';
-  label.textContent = ch.label;
-
+  const items = quizData.filter(q => q.ch === ch.id);
+  const count = items.length;
+  const div = document.createElement('div');
+  div.className = 'toc-item';
+  div.innerHTML = `
+    <span class="toc-num">${String(i+1).padStart(2,'0')}</span>
+    <span class="toc-label">${ch.label}</span>
+    <span class="toc-meta">${count > 0 ? count+'문항' : ''}</span>
+  `;
   const btn = document.createElement('button');
   if (count > 0) {
     btn.className = 'toc-btn';
@@ -285,11 +330,8 @@ chapters.forEach((ch, i) => {
     btn.className = 'toc-btn wip';
     btn.textContent = '준비중';
   }
-
-  item.appendChild(num);
-  item.appendChild(label);
-  item.appendChild(btn);
-  tocList.appendChild(item);
+  div.appendChild(btn);
+  tocList.appendChild(div);
 });
 
 function showToc() {
@@ -310,45 +352,82 @@ function renderQuiz(chId) {
   const wrap = document.getElementById('quizContent');
   wrap.innerHTML = '';
   const items = quizData.filter(q => q.ch === chId);
-
-  if (items.length === 0) {
-    wrap.innerHTML = '<p class="placeholder-note">기출문제를 추가해주세요.</p>';
+  if (!items.length) {
+    wrap.innerHTML = '<p style="text-align:center;color:var(--muted);padding:40px 0;font-style:italic;">준비 중입니다.</p>';
     return;
   }
-
-  items.forEach((q, i) => {
-    const card = document.createElement('article');
+  items.forEach((q, qi) => {
+    const card = document.createElement('div');
     card.className = 'qcard';
 
     const num = document.createElement('div');
     num.className = 'q-num';
-    num.textContent = `문제 ${i + 1}`;
+    num.textContent = `문제 ${qi + 1}`;
     card.appendChild(num);
 
-    const body = document.createElement('pre');
-    body.className = 'q-body';
-    body.textContent = q.text;
-    card.appendChild(body);
+    const text = document.createElement('div');
+    text.className = 'q-text';
+    text.textContent = q.text;
+    card.appendChild(text);
 
-    if (q.ans) {
+    const opts = document.createElement('div');
+    opts.className = 'options';
+
+    const expBox = document.createElement('div');
+    expBox.className = 'exp-box';
+    expBox.innerHTML = `<div class="exp-label">해설</div>${q.exp}`;
+
+    const resetBtn = document.createElement('button');
+    resetBtn.className = 'reset-btn';
+    resetBtn.textContent = '↺ 다시 풀기';
+    resetBtn.style.display = 'none';
+
+    let answered = false;
+
+    q.options.forEach((opt, oi) => {
       const btn = document.createElement('button');
-      btn.className = 'answer-btn';
-      btn.innerHTML = '▶ 정답 및 해설 보기';
-      card.appendChild(btn);
-
-      const box = document.createElement('div');
-      box.className = 'answer-box';
-      box.innerHTML = `<div class="ans-label">정답: ${q.ans}</div><div>${q.exp || ''}</div>`;
-      card.appendChild(box);
+      btn.className = 'opt-btn';
+      btn.innerHTML = `<span class="opt-mark">${MARKS[oi]}</span><span>${opt}</span>`;
 
       btn.addEventListener('click', () => {
-        const open = box.classList.contains('visible');
-        box.classList.toggle('visible', !open);
-        btn.classList.toggle('open', !open);
-        btn.innerHTML = open ? '▶ 정답 및 해설 보기' : '▼ 정답 및 해설 닫기';
-      });
-    }
+        if (answered) return;
+        answered = true;
 
+        // 모든 버튼 비활성화
+        opts.querySelectorAll('.opt-btn').forEach((b, bi) => {
+          b.disabled = true;
+          if (bi === q.ans) {
+            // 정답 표시
+            if (bi === oi) {
+              b.classList.add('correct'); // 내가 고른 정답
+            } else {
+              b.classList.add('reveal'); // 내가 안 고른 정답
+            }
+          } else if (bi === oi) {
+            b.classList.add('wrong'); // 내가 고른 오답
+          }
+        });
+
+        expBox.classList.add('visible');
+        resetBtn.style.display = 'inline-flex';
+      });
+
+      opts.appendChild(btn);
+    });
+
+    resetBtn.addEventListener('click', () => {
+      answered = false;
+      opts.querySelectorAll('.opt-btn').forEach(b => {
+        b.disabled = false;
+        b.classList.remove('correct','wrong','reveal');
+      });
+      expBox.classList.remove('visible');
+      resetBtn.style.display = 'none';
+    });
+
+    card.appendChild(opts);
+    card.appendChild(expBox);
+    card.appendChild(resetBtn);
     wrap.appendChild(card);
   });
 }
