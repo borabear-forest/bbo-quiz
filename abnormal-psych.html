@@ -24,14 +24,15 @@
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
+pre { font-family: 'Noto Sans KR', sans-serif; }
 body { font-family: 'Noto Sans KR', sans-serif; background: var(--bg); color: var(--ink); min-height: 100vh; }
 
-/* Header */
+/* ── Header ── */
 header { background: var(--ink); color: #fff; padding: 28px 20px 24px; text-align: center; }
 header h1 { font-family: 'Noto Serif KR', serif; font-size: clamp(20px, 4vw, 34px); letter-spacing: -.03em; }
 header p { margin-top: 5px; font-size: 12px; color: rgba(255,255,255,.5); }
 
-/* TOC */
+/* ── TOC ── */
 #tocPage { max-width: 680px; margin: 0 auto; padding: 28px 14px 80px; }
 .toc-list { display: flex; flex-direction: column; gap: 8px; }
 .toc-item {
@@ -45,12 +46,16 @@ header p { margin-top: 5px; font-size: 12px; color: rgba(255,255,255,.5); }
 .toc-info { flex: 1; min-width: 0; }
 .toc-title { font-size: 15px; font-weight: 500; color: var(--ink); letter-spacing: -.02em; }
 .toc-sub { font-size: 11px; color: var(--muted); margin-top: 2px; }
-.toc-badges { display: flex; gap: 6px; margin-top: 7px; flex-wrap: wrap; }
+/* PC: 뱃지+버튼 오른쪽 / 모바일: 아래 */
 .toc-right { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
-.badge {
-  font-size: 11px; font-weight: 700; border-radius: 999px; padding: 3px 10px;
-  cursor: pointer; transition: opacity .15s; white-space: nowrap;
+.toc-mobile { display: none; }
+@media (max-width: 560px) {
+  .toc-item { align-items: flex-start; }
+  .toc-num { padding-top: 2px; }
+  .toc-right { display: none; }
+  .toc-mobile { display: flex; gap: 6px; margin-top: 7px; flex-wrap: wrap; align-items: center; }
 }
+.badge { font-size: 11px; font-weight: 700; border-radius: 999px; padding: 3px 10px; cursor: pointer; transition: opacity .15s; white-space: nowrap; }
 .badge:hover { opacity: .7; }
 .badge-mc   { background: var(--soft); color: var(--muted); }
 .badge-desc { background: var(--navy-soft); color: #6e8fb5; }
@@ -62,21 +67,17 @@ header p { margin-top: 5px; font-size: 12px; color: rgba(255,255,255,.5); }
 }
 .toc-btn:hover { background: var(--accent); color: #fff; }
 
-/* Chapter page */
+/* ── Chapter ── */
 #chPage { display: none; }
-.topbar {
-  background: var(--paper); border-bottom: 1px solid var(--line);
-  position: sticky; top: 0; z-index: 30; padding: 10px 14px;
-}
+.topbar { background: var(--paper); border-bottom: 1px solid var(--line); position: sticky; top: 0; z-index: 30; padding: 10px 14px; }
 .back-btn {
   border: 1.5px solid var(--line); background: var(--paper); color: var(--muted);
   border-radius: 999px; padding: 5px 14px; font-size: 12px; font-weight: 700;
-  font-family: inherit; cursor: pointer; transition: all .15s;
-  -webkit-tap-highlight-color: transparent;
+  font-family: inherit; cursor: pointer; transition: all .15s; -webkit-tap-highlight-color: transparent;
 }
 .back-btn:hover { border-color: var(--ink); color: var(--ink); }
 
-/* Tabs */
+/* ── Tabs ── */
 .tab-bar { max-width: 840px; margin: 0 auto; padding: 18px 14px 0; display: flex; gap: 4px; }
 .tab-btn {
   border: none; background: transparent; color: var(--muted);
@@ -85,64 +86,42 @@ header p { margin-top: 5px; font-size: 12px; color: rgba(255,255,255,.5); }
   transition: all .15s; border-bottom: 2.5px solid transparent;
   -webkit-tap-highlight-color: transparent;
 }
-.tab-btn.active-mc  { color: var(--accent); border-bottom-color: var(--accent); background: var(--paper); }
-.tab-btn.active-desc { color: var(--navy);  border-bottom-color: var(--navy);  background: var(--paper); }
+.tab-btn.active-mc   { color: var(--accent); border-bottom-color: var(--accent); background: var(--paper); }
+.tab-btn.active-desc { color: var(--navy);   border-bottom-color: var(--navy);   background: var(--paper); }
 .tab-btn:hover:not(.active-mc):not(.active-desc) { color: var(--ink); }
 .tab-panel { display: none; }
 .tab-panel.active { display: block; }
 
-/* Chapter header */
+/* ── Chapter header ── */
 .wrap { max-width: 840px; margin: 0 auto; padding: 0 14px 80px; }
-.ch-header {
-  display: flex; align-items: center; gap: 14px;
-  padding: 18px 0 12px; margin-bottom: 20px; border-bottom: 2px solid var(--ink);
-}
+.ch-header { display: flex; align-items: center; gap: 14px; padding: 18px 0 12px; margin-bottom: 20px; border-bottom: 2px solid var(--ink); }
 .ch-num { font-family: 'Noto Serif KR', serif; font-size: 20px; font-weight: 700; color: var(--muted); flex-shrink: 0; }
 .ch-info h2 { font-family: 'Noto Serif KR', serif; font-size: 20px; letter-spacing: -.03em; line-height: 1.2; }
 .ch-info span { font-size: 11px; color: var(--muted); }
 
-/* Question card */
+/* ── Question card ── */
 .qcard { background: var(--paper); border: 1px solid var(--line); border-radius: var(--r); padding: 18px 20px; margin-bottom: 12px; box-shadow: var(--sh); }
 .q-num { font-size: 11px; font-weight: 900; color: var(--muted); letter-spacing: .07em; margin-bottom: 7px; }
 .case-label { font-size: 11px; font-weight: 900; color: var(--accent2); margin-bottom: 4px; }
 .q-body { font-size: 15px; line-height: 1.75; white-space: pre-wrap; word-break: keep-all; overflow-wrap: break-word; }
-.premise-box {
-  background: #f4f0e8; border: 1px solid #d6cebc; border-radius: 10px;
-  padding: 12px 15px; margin: 8px 0; font-size: 14px; line-height: 1.85;
-  white-space: pre-wrap; word-break: keep-all; overflow-wrap: break-word;
-}
-.case-box {
-  background: #fdf6ec; border: 1.5px solid #e8c97a; border-radius: 10px;
-  padding: 13px 15px; margin: 0 0 8px; font-size: 14px; line-height: 1.85;
-  white-space: pre-wrap; word-break: keep-all; overflow-wrap: break-word; color: #4a3000;
-}
+.q-question { margin-bottom: 10px; padding-bottom: 10px; border-bottom: 1px solid var(--line); }
+.premise-box { background: #f4f0e8; border: 1px solid #d6cebc; border-radius: 10px; padding: 12px 15px; margin: 8px 0; font-size: 14px; line-height: 1.85; white-space: pre-wrap; word-break: keep-all; overflow-wrap: break-word; }
+.case-box { background: #fdf6ec; border: 1.5px solid #e8c97a; border-radius: 10px; padding: 13px 15px; margin: 0 0 8px; font-size: 14px; line-height: 1.85; white-space: pre-wrap; word-break: keep-all; overflow-wrap: break-word; color: #4a3000; }
 .choices { font-size: 15px; line-height: 1.9; white-space: pre-wrap; margin-top: 4px; word-break: keep-all; }
 
-/* Answer */
-.ans-btn {
-  margin-top: 12px; display: inline-flex; align-items: center; gap: 5px;
-  padding: 7px 15px; border-radius: 999px; border: 1.5px solid var(--accent);
-  background: transparent; color: var(--accent); font-size: 13px; font-weight: 700;
-  font-family: inherit; cursor: pointer; transition: all .15s;
-  -webkit-tap-highlight-color: transparent;
-}
+/* ── Answer (객관식) ── */
+.ans-btn { margin-top: 12px; display: inline-flex; align-items: center; gap: 5px; padding: 7px 15px; border-radius: 999px; border: 1.5px solid var(--accent); background: transparent; color: var(--accent); font-size: 13px; font-weight: 700; font-family: inherit; cursor: pointer; transition: all .15s; -webkit-tap-highlight-color: transparent; }
 .ans-btn:hover { background: var(--soft); }
 .ans-btn.open { background: var(--accent); color: #fff; }
 .ans-box { display: none; margin-top: 10px; padding: 13px 15px; background: var(--soft); border-radius: 10px; border: 1px solid #c8dbb8; font-size: 14px; line-height: 1.7; }
 .ans-box.show { display: block; }
 .ans-label { font-weight: 900; color: var(--accent); margin-bottom: 5px; }
 
-/* Desc card */
+/* ── 서술형 ── */
 .desc-card { background: var(--paper); border: 1px solid var(--line); border-radius: var(--r); padding: 18px 20px; margin-bottom: 12px; box-shadow: var(--sh); }
 .desc-num { font-size: 11px; font-weight: 900; color: var(--navy); letter-spacing: .07em; margin-bottom: 7px; }
 .desc-q { font-size: 15px; line-height: 1.75; word-break: keep-all; overflow-wrap: break-word; }
-.desc-btn {
-  margin-top: 12px; display: inline-flex; align-items: center; gap: 5px;
-  padding: 7px 15px; border-radius: 999px; border: 1.5px solid var(--navy);
-  background: transparent; color: var(--navy); font-size: 13px; font-weight: 700;
-  font-family: inherit; cursor: pointer; transition: all .15s;
-  -webkit-tap-highlight-color: transparent;
-}
+.desc-btn { margin-top: 12px; display: inline-flex; align-items: center; gap: 5px; padding: 7px 15px; border-radius: 999px; border: 1.5px solid var(--navy); background: transparent; color: var(--navy); font-size: 13px; font-weight: 700; font-family: inherit; cursor: pointer; transition: all .15s; -webkit-tap-highlight-color: transparent; }
 .desc-btn:hover { background: var(--navy-soft); }
 .desc-btn.open { background: var(--navy); color: #fff; }
 .desc-box { display: none; margin-top: 10px; padding: 13px 15px; background: var(--navy-soft); border-radius: 10px; border: 1px solid var(--navy-line); font-size: 14px; line-height: 1.8; white-space: pre-wrap; word-break: keep-all; overflow-wrap: break-word; }
@@ -174,6 +153,8 @@ header p { margin-top: 5px; font-size: 12px; color: rgba(255,255,255,.5); }
     <div class="tab-panel" id="tabDesc"></div>
   </div>
 </div>
+
+<footer style="text-align:center;padding:24px;color:var(--muted);font-size:12px;border-top:1px solid var(--line);">이상심리학 DSM-5-TR 기반 학습 자료</footer>
 
 <script>
 const chapters = [
@@ -1532,10 +1513,9 @@ const questions = rawQuestions.map(q => {
   return { ...q, seq: mcCount[q.ch] };
 });
 
-// ── 보기 박스 파싱 ──
+// ── [PREMISE] 블록 렌더링 ──
 function renderBody(text, boxCls) {
-  // \\n → 실제 줄바꿈
-  text = text.replace(/\\n/g, '\n');
+  text = text.replace(/\n/g, '\n');
   const re = /\[PREMISE\]([\s\S]*?)\[\/PREMISE\]/g;
   const frag = document.createDocumentFragment();
   let last = 0, m;
@@ -1562,87 +1542,125 @@ function renderBody(text, boxCls) {
   return frag;
 }
 
+// ── 카드 내 문제 렌더링 ──
+function renderQuestion(card, q) {
+  const raw = q.text.replace(/\n/g, '\n');
+
+  if (q.isCase) {
+    // 사례형: 발문 + [PREMISE] 박스 + 선지
+    const lbl = document.createElement('div');
+    lbl.className = 'case-label';
+    lbl.textContent = '📋 사례';
+    card.appendChild(lbl);
+    const nl = raw.indexOf('\n');
+    const qLine = document.createElement('pre');
+    qLine.className = 'q-body q-question';
+    qLine.textContent = nl > -1 ? raw.slice(0, nl).trim() : raw.trim();
+    card.appendChild(qLine);
+    if (nl > -1) card.appendChild(renderBody(raw.slice(nl + 1), 'case-box'));
+  } else {
+    // 일반형: 발문 + (보기 박스) + 선지
+    const lines = raw.split('\n');
+    const choiceIdx = lines.findIndex(l => /^[①②③④⑤]/.test(l.trim()));
+    const qText = lines[0].trim();
+    const mid = choiceIdx > 1 ? lines.slice(1, choiceIdx).join('\n').trim() : '';
+    const choices = choiceIdx > -1 ? lines.slice(choiceIdx).join('\n').trim()
+                  : lines.slice(1).join('\n').trim();
+
+    const qLine = document.createElement('pre');
+    qLine.className = 'q-body q-question';
+    qLine.textContent = qText;
+    card.appendChild(qLine);
+
+    if (mid) {
+      if (mid.indexOf('[PREMISE]') > -1) {
+        card.appendChild(renderBody(mid));
+      } else {
+        const box = document.createElement('div');
+        box.className = 'premise-box';
+        box.textContent = mid;
+        card.appendChild(box);
+      }
+    }
+
+    if (choices) {
+      const pre = document.createElement('pre');
+      pre.className = 'choices';
+      pre.textContent = choices;
+      card.appendChild(pre);
+    }
+  }
+}
+
 // ── 목차 렌더링 ──
 const tocList = document.getElementById('tocList');
 chapters.forEach((ch, i) => {
   const mc = mcCount[ch.id] || 0;
   const dc = (descQuestions[ch.id] || []).length;
+  const numStr = String(i).padStart(2, '0');
+  const badgesHTML =
+    '<span class="badge badge-mc">객관식 ' + mc + '문항</span>' +
+    '<span class="badge badge-desc">서술형 ' + dc + '문항</span>' +
+    '<button class="toc-btn">문제풀기 &#8594;</button>';
+
   const item = document.createElement('div');
   item.className = 'toc-item';
   item.innerHTML =
-    '<div class="toc-num">' + String(i).padStart(2,'0') + '</div>' +
+    '<div class="toc-num">' + numStr + '</div>' +
     '<div class="toc-info">' +
       '<div class="toc-title">' + ch.label + '</div>' +
       '<div class="toc-sub">' + ch.sub + '</div>' +
+      '<div class="toc-mobile">' + badgesHTML + '</div>' +
     '</div>' +
-    '<div class="toc-right">' +
-      '<span class="badge badge-mc">객관식 ' + mc + '문항</span>' +
-      '<span class="badge badge-desc">서술형 ' + dc + '문항</span>' +
-      '<button class="toc-btn">문제풀기 &#8594;</button>' +
-    '</div>';
-  item.querySelector('.badge-mc').addEventListener('click',   e => { e.stopPropagation(); open(ch.id, 'mc'); });
-  item.querySelector('.badge-desc').addEventListener('click', e => { e.stopPropagation(); open(ch.id, 'desc'); });
-  item.querySelector('.toc-btn').addEventListener('click',    e => { e.stopPropagation(); open(ch.id, 'mc'); });
-  item.addEventListener('click', () => open(ch.id, 'mc'));
-  tocList.appendChild(item);});
+    '<div class="toc-right">' + badgesHTML + '</div>';
+
+  item.querySelectorAll('.badge-mc').forEach(el =>
+    el.addEventListener('click', e => { e.stopPropagation(); openChapter(ch.id, 'mc'); }));
+  item.querySelectorAll('.badge-desc').forEach(el =>
+    el.addEventListener('click', e => { e.stopPropagation(); openChapter(ch.id, 'desc'); }));
+  item.querySelectorAll('.toc-btn').forEach(el =>
+    el.addEventListener('click', e => { e.stopPropagation(); openChapter(ch.id, 'mc'); }));
+  item.addEventListener('click', () => openChapter(ch.id, 'mc'));
+  tocList.appendChild(item);
+});
+
+// ── 챕터 헤더 생성 ──
+function makeHeader(ch, idx) {
+  const hdr = document.createElement('div');
+  hdr.className = 'ch-header';
+  hdr.innerHTML =
+    '<div class="ch-num">' + String(idx).padStart(2,'0') + '</div>' +
+    '<div class="ch-info"><h2>' + ch.label + '</h2><span>' + ch.sub + '</span></div>';
+  return hdr;
+}
 
 // ── 챕터 진입 ──
-function open(chId, tab) {
+function openChapter(chId, tab) {
   const ch = chapters.find(c => c.id === chId);
+  const idx = chapters.indexOf(ch);
 
-  // 페이지 전환
   document.getElementById('tocPage').style.display = 'none';
-  const chPage = document.getElementById('chPage');
-  chPage.style.display = 'block';
+  document.getElementById('chPage').style.display = 'block';
   requestAnimationFrame(() => window.scrollTo(0, 0));
 
   // 탭 활성화
   document.querySelectorAll('.tab-btn').forEach(b => b.className = 'tab-btn');
   document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
-  const activeBtn = document.querySelector('.tab-btn[data-tab="' + tab + '"]');
-  activeBtn.className = 'tab-btn active-' + tab;
+  document.querySelector('.tab-btn[data-tab="' + tab + '"]').className = 'tab-btn active-' + tab;
   document.getElementById('tab' + tab.charAt(0).toUpperCase() + tab.slice(1)).classList.add('active');
 
   // 객관식 렌더링
   const mcPanel = document.getElementById('tabMc');
   mcPanel.innerHTML = '';
-  const idx = chapters.indexOf(ch);
-  const hdr = document.createElement('div');
-  hdr.className = 'ch-header';
-  hdr.innerHTML = '<div class="ch-num">' + String(idx).padStart(2,'0') + '</div><div class="ch-info"><h2>' + ch.label + '</h2><span>' + ch.sub + '</span></div>';
-  mcPanel.appendChild(hdr);
-
+  mcPanel.appendChild(makeHeader(ch, idx));
   questions.filter(q => q.ch === chId).forEach(q => {
     const card = document.createElement('article');
     card.className = 'qcard';
-
     const num = document.createElement('div');
     num.className = 'q-num';
     num.textContent = '문제 ' + q.seq;
     card.appendChild(num);
-
-    if (q.isCase) {
-      const lbl = document.createElement('div');
-      lbl.className = 'case-label';
-      lbl.textContent = '📋 사례';
-      card.appendChild(lbl);
-      // 데이터 내 \\n(이스케이프) 기준으로 발문/본문 분리
-      const raw = q.text;
-      const sepIdx = raw.indexOf('\\n');
-      const realNL = raw.indexOf('\n');
-      const sep = sepIdx > -1 ? sepIdx : (realNL > -1 ? realNL : -1);
-      const step = (sep === sepIdx && sepIdx > -1) ? 2 : 1;
-      const questionLine = sep > -1 ? raw.slice(0, sep).trim() : raw.trim();
-      const rest = sep > -1 ? raw.slice(sep + step) : '';
-      const qLine = document.createElement('pre');
-      qLine.className = 'q-body';
-      qLine.textContent = questionLine;
-      card.appendChild(qLine);
-      if (rest) card.appendChild(renderBody(rest, 'case-box'));
-    } else {
-      card.appendChild(renderBody(q.text));
-    }
-
+    renderQuestion(card, q);
     const btn = document.createElement('button');
     btn.className = 'ans-btn';
     btn.innerHTML = '&#9654; 정답 및 해설 보기';
@@ -1656,18 +1674,13 @@ function open(chId, tab) {
       btn.classList.toggle('open', o);
       btn.innerHTML = o ? '&#9660; 정답 및 해설 닫기' : '&#9654; 정답 및 해설 보기';
     });
-
     mcPanel.appendChild(card);
   });
 
   // 서술형 렌더링
   const descPanel = document.getElementById('tabDesc');
   descPanel.innerHTML = '';
-  const dhdr = document.createElement('div');
-  dhdr.className = 'ch-header';
-  dhdr.innerHTML = '<div class="ch-num">' + String(idx).padStart(2,'0') + '</div><div class="ch-info"><h2>' + ch.label + '</h2><span>' + ch.sub + '</span></div>';
-  descPanel.appendChild(dhdr);
-
+  descPanel.appendChild(makeHeader(ch, idx));
   const dqs = descQuestions[chId] || [];
   if (!dqs.length) {
     const note = document.createElement('p');
@@ -1724,8 +1737,5 @@ document.querySelectorAll('.tab-btn').forEach(btn => {
   });
 });
 </script>
-
-<footer style="text-align:center; padding:24px; color:var(--muted); font-size:12px; border-top:1px solid var(--line);">이상심리학 DSM-5-TR 기반 학습 자료</footer>
-
 </body>
 </html>
